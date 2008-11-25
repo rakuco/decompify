@@ -1,6 +1,7 @@
 #
 # MC404 - 2008s2
 # Projeto 2
+#   decompify - COM files disassembler for Linux
 #
 # 071294 - Jorge Augusto Hongo
 # 072201 - Raphael Kubo da Costa
@@ -10,7 +11,7 @@ AS=nasm
 ASFLAGS=-f elf -g
 LD=ld
 
-EXE=prj2
+EXE=decompify
 OBJS=main.o file.o
 SRCS=main.asm file.asm
 

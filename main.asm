@@ -1,6 +1,7 @@
 ;;
 ;; MC404ABCD - 2008s2
 ;; Projeto 2
+;;     decompify - COM files disassembler for Linux.
 ;;
 ;; 071294 - Jorge Augusto Hongo
 ;; 072201 - Raphael Kubo da Costa
@@ -29,7 +30,7 @@
 
 section .data
   ;; Error messages
-  usage_msg                     db      "Uso: ./prj2 executavel.com output.asm", 0x0A, 0
+  usage_msg                     db      "Uso: ./decompify executavel.com output.asm", 0x0A, 0
   usage_msg_len                 equ     $-usage_msg
 
 section .text
