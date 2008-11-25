@@ -24,10 +24,27 @@
 
 %include "syscalls.h"
 
+;; Number of command line arguments
+%define ARGC              3
+
+section .data
+  ;; Error messages
+  usage_msg                     db      "Uso: ./prj2 executavel.com output.asm", 0x0A, 0
+  usage_msg_len                 equ     $-usage_msg
+
 section .text
   global _start
 
 _start:
+  ;; Check arguments and exit if the command line is incorrect
+  pop eax
+  cmp eax, ARGC
+  jne near .exit_usage
+
   sys_exit EX_OK
+
+.exit_usage:
+  sys_write STDOUT, usage_msg, usage_msg_len
+  sys_exit  EX_USAGE
 
 ; vim:syntax=nasm:
