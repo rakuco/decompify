@@ -1,0 +1,2 @@
+º	´	Í!Í Hello World
+$
