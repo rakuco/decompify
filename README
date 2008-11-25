@@ -1,0 +1,11 @@
+decompify
+  An MS-DOS COM files disassembler for Linux.
+=============================================
+
+This project comes from an Assembly Languages and Computer Organization class
+assignment from State University of Campinas, Brazil.
+
+The code is licensed under the General Public License (GPL) and should be used
+by other students who want to learn Assembly.
+
+It's written for NASM and should compile under any Linux 2.6.x kernel.
