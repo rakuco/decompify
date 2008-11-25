@@ -26,3 +26,8 @@ Invalid bytes
     db BYTE
 
   in the code.
+
+Jumps and labels
+----------------
+  Currently, jumps and branches do not generate labels. The code generated inserts
+  the literal address of the jump after the mnemonic.
