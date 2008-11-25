@@ -28,10 +28,21 @@
 ;; Number of command line arguments
 %define ARGC              3
 
+section .bss
+  ;; Files (input and output)
+  asmfile_fd                resw    2
+  asmfile_name              resb    255
+  comfile_fd                resw    2
+  comfile_name              resb    255
+
 section .data
   ;; Error messages
-  usage_msg                     db      "Uso: ./decompify executavel.com output.asm", 0x0A, 0
-  usage_msg_len                 equ     $-usage_msg
+  open_input_file_msg       db      "Erro ao abrir arquivo executavel", 0x0A, 0
+  open_input_file_msg_len   equ     $-open_input_file_msg
+  open_output_file_msg      db      "Erro ao abrir arquivo de saida", 0x0A, 0
+  open_output_file_msg_len  equ     $-open_output_file_msg
+  usage_msg                 db      "Uso: ./decompify executavel.com output.asm", 0x0A, 0
+  usage_msg_len             equ     $-usage_msg
 
 section .text
   global _start
@@ -42,7 +53,31 @@ _start:
   cmp eax, ARGC
   jne near .exit_usage
 
+  ;; Skip the first argument (executable name) and get the file names
+  pop eax
+  pop dword [comfile_name]
+  pop dword [asmfile_name]
+
+  ;; Open the files, exit on error
+  sys_open [comfile_name]
+  cmp eax, -1
+  jle .exit_open_input_file
+  mov [comfile_fd], eax
+
+  sys_open [asmfile_name], O_WRONLY
+  cmp eax, -1
+  jle .exit_open_output_file
+  mov [asmfile_fd], eax
+
   sys_exit EX_OK
+
+.exit_open_input_file:
+  sys_write STDOUT, open_input_file_msg, open_input_file_msg_len
+  sys_exit EX_DATAERR
+
+.exit_open_output_file:
+  sys_write STDOUT, open_output_file_msg, open_output_file_msg_len
+  sys_exit EX_DATAERR
 
 .exit_usage:
   sys_write STDOUT, usage_msg, usage_msg_len
