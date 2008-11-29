@@ -36,14 +36,6 @@ section .bss
   comfile_name              resb    255
 
 
-
-
-  ;; Buffer used to get a vector of bits
-  first_byte                resw    8
-
-
-
-
 section .data
   ;; Error messages
   open_input_file_msg       db      "Erro ao abrir arquivo executavel", 0x0A, 0
@@ -54,15 +46,8 @@ section .data
   usage_msg_len             equ     $-usage_msg
 
 
-
-
-  command_vector            db      0, 0, 0, 0, 0, 0, 0, 0
-
-
-
-
-
 section .text
+  extern disasm_write_header
   global _start
 
 _start:
@@ -82,59 +67,18 @@ _start:
   jle .exit_open_input_file
   mov [comfile_fd], eax
 
-  sys_open [asmfile_name], O_WRONLY
+  sys_open [asmfile_name], O_WRONLY|O_TRUNC|O_CREAT
   cmp eax, -1
   jle .exit_open_output_file
   mov [asmfile_fd], eax
 
+  ;; Write the code header
+  push dword [asmfile_fd]
+  call disasm_write_header
 
-
-
-
-
-
-  ;; Get the first byte from the .COM flie
-  push ebp
-  mov ebp, esp  
-
-next_command:
-  sys_read [ebp+8], first_byte, 8
-
-  push eax
-  push ebx
-  push edx
-  mov ebx, offset command_vector
-  mov edx, offset first_byte
-  
-  sub esi, esi
-  mov ecx, 8
-fill_command_vector:
-  mov eax, [edx+esi]
-  mov [ebx+esi], eax
-  inc esi
-  loop fill_command_vector
-
-  ;; Check the command expressed by the byte. If more bytes must de read, it returns eax as 1. I must check if the
-  ;; algorithm will actually read only the first byte
-  push eax
-  call verify_first_byte
-  cmp eax, 1
-  jne prepare_next_command  
-
-
-prepare_next_command:
-  pop eax
-  pop eax
-  pop ebx
-  pop edx
-  jmp next_command
-
-
-
-
-
-
-
+  ;; Close the files and exit
+  sys_close [comfile_fd]
+  sys_close [asmfile_fd]
   sys_exit EX_OK
 
 .exit_open_input_file:
@@ -142,6 +86,7 @@ prepare_next_command:
   sys_exit EX_DATAERR
 
 .exit_open_output_file:
+  sys_close [comfile_fd]
   sys_write STDOUT, open_output_file_msg, open_output_file_msg_len
   sys_exit EX_DATAERR
 

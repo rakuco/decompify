@@ -12,8 +12,8 @@ ASFLAGS=-f elf -g
 LD=ld
 
 EXE=decompify
-OBJS=main.o file.o
-SRCS=main.asm file.asm
+OBJS=main.o disasm.o file.o
+SRCS=main.asm disasm.asm file.asm
 
 .SUFFIXES: .asm .o
 
