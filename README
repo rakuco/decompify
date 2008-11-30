@@ -19,6 +19,12 @@ Instruction set
 
   The instructions which are implemented can be found in assignment/proj02.pdf.
 
+Multiple mnemonics
+------------------
+  Some instructions have more than one possible mnemonic which corresponds to
+  the same opcode, such as WAIT/FWAIT and XLAT/XLATB.
+  In these cases, the mnemonic output by ndisasm was chosen.
+
 Invalid bytes
 -------------
   In case decompify finds an erroneus byte in the code, it just writes a
