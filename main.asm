@@ -27,11 +27,14 @@
 
 ;; Number of command line arguments
 %define ARGC              3
+;; Maximum size of a .COM file
+%define COMFILEMAXSIZE    0xFFFF
 
 section .bss
   ;; Files (input and output)
   asmfile_fd                resw    2
   asmfile_name              resb    255
+  comfile                   resb    COMFILEMAXSIZE
   comfile_fd                resw    2
   comfile_name              resb    255
 
@@ -61,12 +64,17 @@ _start:
   pop dword [comfile_name]
   pop dword [asmfile_name]
 
-  ;; Open the files, exit on error
+  ;; Open the .COM file, exit on error
   sys_open [comfile_name]
   cmp eax, -1
   jle .exit_open_input_file
   mov [comfile_fd], eax
 
+  ;; Read its whole content and close the file
+  sys_read [comfile_fd], [comfile], COMFILEMAXSIZE
+  sys_close [comfile_fd]
+
+  ;; Open the output .ASM file, exit on error
   sys_open [asmfile_name], O_WRONLY|O_TRUNC|O_CREAT
   cmp eax, -1
   jle .exit_open_output_file
@@ -77,7 +85,6 @@ _start:
   call disasm_write_header
 
   ;; Close the files and exit
-  sys_close [comfile_fd]
   sys_close [asmfile_fd]
   sys_exit EX_OK
 
@@ -86,7 +93,6 @@ _start:
   sys_exit EX_DATAERR
 
 .exit_open_output_file:
-  sys_close [comfile_fd]
   sys_write STDOUT, open_output_file_msg, open_output_file_msg_len
   sys_exit EX_DATAERR
 
