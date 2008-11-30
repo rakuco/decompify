@@ -40,8 +40,8 @@ section .data
 section .text
   global disasm_write_header
 
-;; disasm_write_header (void)
-;;   Writes a small header present in every disassembled file.
+;; disasm_write_header (int fd)
+;;   Writes a small header present in every disassembled file to fd.
 ;;   This header contains a comment telling the version of the program
 ;;   and also the ORG 0x100 and 'start:' parts of the code.
 disasm_write_header:
