@@ -50,7 +50,7 @@ section .data
 
 
 section .text
-  extern disasm_write_header
+  extern disasm_write_header, get_file_size
   global _start
 
 _start:
@@ -71,7 +71,10 @@ _start:
   mov [comfile_fd], eax
 
   ;; Read its whole content and close the file
-  sys_read [comfile_fd], [comfile], COMFILEMAXSIZE
+  push word [comfile_fd]
+  call get_file_size
+  add esp, 4
+  sys_read [comfile_fd], [comfile], eax
   sys_close [comfile_fd]
 
   ;; Open the output .ASM file, exit on error
