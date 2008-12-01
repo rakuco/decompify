@@ -158,13 +158,13 @@ _start:
 
   sys_open [logfile_name], O_WRONLY|O_TRUNC|O_CREAT
   cmp eax, -1
-  jle .exit_open_input_file
+  jle near .exit_open_input_file
   mov [logfile_fd], eax
 
   ;; Open the .COM file, exit on error
   sys_open [comfile_name]
   cmp eax, -1
-  jle .exit_open_input_file
+  jle near .exit_open_input_file
   mov [comfile_fd], eax
 
   ;; Read its whole content and close the file
@@ -178,7 +178,7 @@ _start:
   ;; Open the output .ASM file, exit on error
   sys_open [asmfile_name], O_WRONLY|O_TRUNC|O_CREAT
   cmp eax, -1
-  jle .exit_open_output_file
+  jle near .exit_open_output_file
   mov [asmfile_fd], eax
 
   ;; Write the code header
