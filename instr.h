@@ -27,6 +27,7 @@
 %define __INSTR_H
 
 ;; Argument types (immed, r/m etc)
+; Fixed (constant) arguments
 ARGTYPE_NONE      db    0
 ARGTYPE_CONST1    db    1
 ARGTYPE_CONST3    db    2
@@ -50,8 +51,10 @@ ARGTYPE_REGES     db    19
 ARGTYPE_REGCS     db    20
 ARGTYPE_REGSS     db    21
 ARGTYPE_REGDS     db    22
+; Immediate and memory arguments
 ARGTYPE_IMMED     db    23
 ARGTYPE_MEMORY    db    24
+; Pain in the ass arguments
 ARGTYPE_REGMEM    db    25
 ARGTYPE_REGISTER  db    26
 
