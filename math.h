@@ -27,7 +27,7 @@
 %define __MATH_H
 
 ;; mult (int a, int b)
-;;   Multiplies a and by and stores the result in eax (preserves ecx and edx)
+;;   Multiplies a and by b and stores the result in eax (preserves ecx and edx)
 %macro mult 2
   push edx
   push ecx
