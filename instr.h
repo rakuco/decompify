@@ -28,35 +28,35 @@
 
 ;; Argument types (immed, r/m etc)
 ; Fixed (constant) arguments
-ARGTYPE_NONE      db    0
-ARGTYPE_CONST1    db    1
-ARGTYPE_CONST3    db    2
-ARGTYPE_REGAL     db    3
-ARGTYPE_REGCL     db    4
-ARGTYPE_REGDL     db    5
-ARGTYPE_REGBL     db    6
-ARGTYPE_REGAH     db    7
-ARGTYPE_REGCH     db    8
-ARGTYPE_REGDH     db    9
-ARGTYPE_REGBH     db    10
-ARGTYPE_REGAX     db    11
-ARGTYPE_REGCX     db    12
-ARGTYPE_REGDX     db    13
-ARGTYPE_REGBX     db    14
-ARGTYPE_REGSP     db    15
-ARGTYPE_REGBP     db    16
-ARGTYPE_REGSI     db    17
-ARGTYPE_REGDI     db    18
-ARGTYPE_REGES     db    19
-ARGTYPE_REGCS     db    20
-ARGTYPE_REGSS     db    21
-ARGTYPE_REGDS     db    22
+ARGTYPE_NONE        db    0
+ARGTYPE_CONST1      db    1
+ARGTYPE_CONST3      db    2
+ARGTYPE_REGAL       db    3
+ARGTYPE_REGCL       db    4
+ARGTYPE_REGDL       db    5
+ARGTYPE_REGBL       db    6
+ARGTYPE_REGAH       db    7
+ARGTYPE_REGCH       db    8
+ARGTYPE_REGDH       db    9
+ARGTYPE_REGBH       db    10
+ARGTYPE_REGAX       db    11
+ARGTYPE_REGCX       db    12
+ARGTYPE_REGDX       db    13
+ARGTYPE_REGBX       db    14
+ARGTYPE_REGSP       db    15
+ARGTYPE_REGBP       db    16
+ARGTYPE_REGSI       db    17
+ARGTYPE_REGDI       db    18
+ARGTYPE_REGES       db    19
+ARGTYPE_REGCS       db    20
+ARGTYPE_REGSS       db    21
+ARGTYPE_REGDS       db    22
 ; Immediate and memory arguments
-ARGTYPE_IMMED     db    23
-ARGTYPE_MEMORY    db    24
+ARGTYPE_IMMED       db    23
+ARGTYPE_MEMORY      db    24
 ; Pain in the ass arguments
-ARGTYPE_REGMEM    db    25
-ARGTYPE_REGISTER  db    26
+ARGTYPE_REGMEM      db    25
+ARGTYPE_REGISTER    db    26
 
 ;; Strings for the arguments that need it
 SARGTYPE_CONST1     db    "1", 0
