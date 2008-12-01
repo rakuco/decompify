@@ -50,55 +50,33 @@
   StoreData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
 
   ;; TODO: there are subtle differences between these two
-  ;ProcessArgument arg1
-  ;ProcessArgument arg2
+  ProcessArgument arg1
+  ProcessArgument arg2
 %endmacro
 
 %macro ProcessArgument 1
-  cmp dword [type_%1], ARGTYPE_REGMEM
-  jae %%addr_regmem ;; both REGMEM and REGISTER
-  cmp dword [type_%1], ARGTYPE_NONE
-  je  %%addr_end
-  cmp dword [type_%1], ARGTYPE_CONST1
-  je  %%addr_const1
-  cmp dword [type_%1], ARGTYPE_CONST3
-  je  %%addr_const3
-  cmp dword [type_%1], ARGTYPE_IMMED
-  je  %%addr_immed
-  cmp dword [type_%1], ARGTYPE_MEMORY
-  je  %%addr_immed ;; works just like immed in this context
+  ; Constant arguments
+  mov dl, [%1_type]
+  cmp dl, [ARGTYPE_REGDS]  ; Last constant argument in the array
+  jbe %%addr_const
+  cmp dl, [ARGTYPE_REGMEM] ; First of its kind in the array
+  jae %%addr_regmem
+  jmp %%addr_immed  ; FIXME: there will be other types, this comparison will grow
 
-  %%addr_const1:
-    mov [%1_displacement], word 1
+  %%addr_const:
+    ;; %1_displacement = ARRAY_CONSTARGS[4*argN_type]
+    xor edx, edx
+    mov dl, [%1_type]
+    StoreData 32, [4*edx+ARRAY_CONSTARGS], [%1_displacement]
+
     jmp %%addr_end
 
-  %%addr_const3:
-    mov [%1_displacement], word 3
-    jmp %%addr_end
-
-  ;; ARGTYPE_IMMED and ARGTYPE_MEMORY
-  %%addr_immed:
-    test [reg16bits], byte 1
-    jne %%addr_immed16
-    ;; 8-bit version
-    inc esi
-    mov dl, [comfile + esi]
-    mov [%1_displacement], dl
-    inc esi
-    jmp %%addr_end
-    ;; 16-bit version
-  %%addr_immed16:
-    inc esi
-    mov dx, [comfile + esi]
-    mov [%1_displacement], dx
-    inc esi
-    inc esi
-    jmp %%addr_end
-
-  ;; ARGTYPE_REGMEM and ARGTYPE_REGISTER
   %%addr_regmem:
-    sys_write [logfile_fd], usage_msg, 4
     jmp %%addr_end
+
+  %%addr_immed:
+    jmp %%addr_end
+
   %%addr_end:
 %endmacro
 
