@@ -36,7 +36,7 @@
 ;; Destroys:    eax, ebx, ecx
 %macro GetOpcodePosition 1
   mov eax, %1
-  mov ebx, [opcodes]
+  mov ebx, opcodes
   mov ecx, Opcode_size
   mul ecx
   add ebx, eax
