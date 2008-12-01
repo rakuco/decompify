@@ -43,11 +43,11 @@
 %endmacro
 
 %macro LoadOpcodeData 1
-  StoreOpcodeData 32, [ebx + Opcode.mnemonic], [mnemonic]
-  StoreOpcodeData 32, [ebx + Opcode.arg1_type], [arg1_type]
-  StoreOpcodeData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
-  StoreOpcodeData 32, [ebx + Opcode.arg2_type], [arg2_type]
-  StoreOpcodeData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
+  StoreData 32, [ebx + Opcode.mnemonic], [mnemonic]
+  StoreData 32, [ebx + Opcode.arg1_type], [arg1_type]
+  StoreData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
+  StoreData 32, [ebx + Opcode.arg2_type], [arg2_type]
+  StoreData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
 
   ;; TODO: there are subtle differences between these two
   ;ProcessArgument arg1
@@ -104,7 +104,7 @@
 
 ;; In:        register size, src, dest
 ;; Destroys:  edx
-%macro StoreOpcodeData 3
+%macro StoreData 3
   %push TempContext
 
   %if %1 == 8
