@@ -42,18 +42,15 @@
 %endmacro
 
 %macro LoadOpcodeData 1
-  mov edx, [ebx + Opcode.mnemonic]
-  mov [mnemonic], edx
-  mov dl, [ebx + Opcode.reg16bits]
-  mov [reg16bits], dl
-  mov edx, [ebx + Opcode.type_arg1]
-  mov [type_arg1], edx
-  mov edx, [ebx + Opcode.type_arg2]
-  mov [type_arg2], edx
+  StoreOpcodeData 32, [ebx + Opcode.mnemonic], [mnemonic]
+  StoreOpcodeData 32, [ebx + Opcode.arg1_type], [arg1_type]
+  StoreOpcodeData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
+  StoreOpcodeData 32, [ebx + Opcode.arg2_type], [arg2_type]
+  StoreOpcodeData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
 
   ;; TODO: there are subtle differences between these two
-  ProcessArgument arg1
-  ProcessArgument arg2
+  ;ProcessArgument arg1
+  ;ProcessArgument arg2
 %endmacro
 
 %macro ProcessArgument 1
@@ -102,6 +99,25 @@
     sys_write [logfile_fd], usage_msg, 4
     jmp %%addr_end
   %%addr_end:
+%endmacro
+
+;; In:        register size, src, dest
+;; Destroys:  edx
+%macro StoreOpcodeData 3
+  %push TempContext
+
+  %if %1 == 8
+    %define %$reg dl
+  %elif %1 == 32
+    %define %$reg edx
+  %else
+    %error "First argument must be 8 or 32"
+  %endif
+
+  mov %$reg, %2
+  mov %3, %$reg
+
+  %pop
 %endmacro
 
 
