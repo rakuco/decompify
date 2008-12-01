@@ -207,14 +207,14 @@ _start:
   xor esi, esi
   .main_loop:
     cmp esi, [comfile_size]
-    jae .end_main_loop
+    jae near .end_main_loop
 
     ;; Get the corresponding opcode position in the table
     GetOpcodePosition [comfile + esi] ; ebx = opcodes[[comfile+esi]]
     LoadOpcodeData ebx
 
     inc esi
-    jmp .main_loop
+    ;jmp .main_loop
   .end_main_loop:
 
   ;; Close the files and exit
