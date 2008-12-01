@@ -31,8 +31,9 @@
 ;; Maximum size of a .COM file
 %define COMFILEMAXSIZE    0xFFFF
 
-; In:         buffer byte
-; Destroys:   ax, bx
+;; In:          buffer byte
+;; Out:         ebx = opcode position in the table
+;; Destroys:    eax, ebx, ecx
 %macro GetOpcodePosition 1
   mov eax, %1
   mov ebx, [opcodes]
