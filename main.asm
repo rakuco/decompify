@@ -183,6 +183,7 @@ _start:
   ;; Write the code header
   push dword [asmfile_fd]
   call disasm_write_header
+  add esp, 4
 
   ;; Main loop
   xor esi, esi
