@@ -103,18 +103,20 @@ ARRAY_RM_MODES      dd    SARGTYPE_RM_BX_SI, SARGTYPE_RM_BX_DI, SARGTYPE_RM_BP_S
 I_ADD             db    "add", 0
 
 struc Opcode
-  .mnemonic:      resd    1
-  .reg16bits:     resb    1
-  .type_arg1:     resd    1
-  .type_arg2:     resd    1
+  .mnemonic:        resd    1
+  .arg1_type:       resd    1
+  .arg1_reg16bits:  resb    1
+  .arg2_type:       resd    1
+  .arg2_reg16bits:  resb    1
 endstruc
 
 opcodes:
   istruc Opcode
-    at Opcode.mnemonic,  dd I_ADD
-    at Opcode.reg16bits, db 0
-    at Opcode.type_arg1, dd ARGTYPE_REGMEM
-    at Opcode.type_arg2, dd ARGTYPE_REGISTER
+    at Opcode.mnemonic,       dd I_ADD
+    at Opcode.arg1_type,      dd ARGTYPE_REGMEM
+    at Opcode.arg1_reg16bits, db 0
+    at Opcode.arg2_type,      dd ARGTYPE_REGISTER
+    at Opcode.arg2_reg16bits, db 0
   iend
 
 %endif

@@ -118,12 +118,13 @@ section .bss
 
   ;; Opcode and its operands
   mnemonic                  resd    1
-  reg16bits                 resb    1
-  type_arg1                 resd    1
-  type_arg2                 resd    1
+  arg1_type                 resd    1
+  arg1_reg16bits            resb    1
   arg1_basereg              resd    1
   arg1_indexreg             resd    1
   arg1_displacement         resw    1
+  arg2_type                 resd    1
+  arg2_reg16bits            resb    1
   arg2_basereg              resd    1
   arg2_indexreg             resd    1
   arg2_displacement         resw    1
