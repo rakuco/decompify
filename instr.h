@@ -55,22 +55,12 @@ ARGTYPE_NONE        db    22
 ARGTYPE_SEGMENT     db    23
 ; Immediate and memory arguments
 ARGTYPE_IMMED       db    24
-ARGTYPE_MEMORY      db    25
+ARGTYPE_SIMMED      db    25
+ARGTYPE_MEMORY      db    26
 ; Pain in the ass arguments
-ARGTYPE_RM_BOTH     db    26
-ARGTYPE_RM_MEMORY   db    27
-ARGTYPE_RM_REGISTER db    28
-
-; FIXME: Properly add these ones
-ARGTYPE_SHORT db 0
-ARGTYPE_NEAR  db 0
-ARGTYPE_FAR   db 0
-ARGTYPE_SIMMED db 0
-GRP_GRP1 db 0
-GRP_GRP2 db 0
-GRP_GRP3 db 0
-GRP_AROP db 0
-GRP_SHFOP db 0
+ARGTYPE_RM_BOTH     db    27
+ARGTYPE_RM_MEMORY   db    28
+ARGTYPE_RM_REGISTER db    29
 
 ;; Strings for the arguments that need it
 SARGTYPE_CONST1     db    "1", 0
