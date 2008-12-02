@@ -146,6 +146,9 @@ def print_opcodes(optable):
     else:
       grp = '0'
 
+    # segment_id
+    seg = "0"
+
     if opcode['arg1']:
       addrmode = args_dict[opcode['arg1']]
       a1type = 'ARGTYPE_' + addrmode[0].upper()
@@ -169,7 +172,7 @@ def print_opcodes(optable):
       a2reg  = '0'
 
     print '    at Opcode.mnemonic,       dd ' + mn
-    print '    at Opcode.mnem_group,     dd ' + grp
+    print '    at Opcode.group_id,       dd ' + grp
     print '    at Opcode.arg1_type,      dd ' + a1type
     print '    at Opcode.arg1_reg16bits, db ' + a1reg
     print '    at Opcode.arg2_type,      dd ' + a2type
