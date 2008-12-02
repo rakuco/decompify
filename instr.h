@@ -115,13 +115,13 @@ ARRAY_16BITREGS     dd    SARGTYPE_REGAX, SARGTYPE_REGCX, SARGTYPE_REGDX
 ARRAY_RM_MODES      dd    SARGTYPE_RM_BX_SI, SARGTYPE_RM_BX_DI, SARGTYPE_RM_BP_SI
                     dd    SARGTYPE_RM_BP_DI, SARGTYPE_RM_SI, SARGTYPE_RM_DI
                     dd    SARGTYPE_RM_BP, SARGTYPE_RM_BX
-ARRAY_SEGMENTS      dd    0, SARGTYPE_REGES, SARGTYPE_REGCS, SARGTYPE_REGSS,
+ARRAY_SEGMENTS      dd    SARGTYPE_REGES, SARGTYPE_REGCS, SARGTYPE_REGSS,
                     dd    SARGTYPE_REGDS
 
 struc Opcode
   .mnemonic:        resd    1
-  .group_id:        resb    1 ; XXX: what size?
-  .segment_id:      resb    1 ; XXX: what size?
+  .group_id:        resd    1
+  .segment_id:      resd    1
   .arg1_type:       resd    1
   .arg1_reg16bits:  resb    1
   .arg2_type:       resd    1
