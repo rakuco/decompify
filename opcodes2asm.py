@@ -147,7 +147,7 @@ def print_mnemonics(mnemonics):
 
 def print_opcodes(optable):
   for pos in range(256):
-    print "  istruc Opcode%s; 0x%X" % (' '*35, pos)
+    print "  istruc Opcode%s; 0x%02X" % (' '*35, pos)
 
     opcode = optable.get(pos, {'mnemonic': None, 'arg1': None, 'arg2': None})
     if opcode['mnemonic']:

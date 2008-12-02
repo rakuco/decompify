@@ -114,7 +114,7 @@ I_XOR            db    "xor", 0
 
 ;; Opcodes
 opcodes:
-  istruc Opcode                                   ; 0x0
+  istruc Opcode                                   ; 0x00
     at Opcode.mnemonic,       dd I_ADD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -123,7 +123,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0x1
+  istruc Opcode                                   ; 0x01
     at Opcode.mnemonic,       dd I_ADD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -132,7 +132,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg2_reg16bits, db 1
   iend
-  istruc Opcode                                   ; 0x2
+  istruc Opcode                                   ; 0x02
     at Opcode.mnemonic,       dd I_ADD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -141,7 +141,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0x3
+  istruc Opcode                                   ; 0x03
     at Opcode.mnemonic,       dd I_ADD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -150,7 +150,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg2_reg16bits, db 1
   iend
-  istruc Opcode                                   ; 0x4
+  istruc Opcode                                   ; 0x04
     at Opcode.mnemonic,       dd I_ADD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -159,7 +159,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_IMMED
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0x5
+  istruc Opcode                                   ; 0x05
     at Opcode.mnemonic,       dd I_ADD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -168,7 +168,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_IMMED
     at Opcode.arg2_reg16bits, db 1
   iend
-  istruc Opcode                                   ; 0x6
+  istruc Opcode                                   ; 0x06
     at Opcode.mnemonic,       dd I_PUSH
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -177,7 +177,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_NONE
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0x7
+  istruc Opcode                                   ; 0x07
     at Opcode.mnemonic,       dd I_POP
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -186,7 +186,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_NONE
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0x8
+  istruc Opcode                                   ; 0x08
     at Opcode.mnemonic,       dd I_OR
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -195,7 +195,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0x9
+  istruc Opcode                                   ; 0x09
     at Opcode.mnemonic,       dd I_OR
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -204,7 +204,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg2_reg16bits, db 1
   iend
-  istruc Opcode                                   ; 0xA
+  istruc Opcode                                   ; 0x0A
     at Opcode.mnemonic,       dd I_OR
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -213,7 +213,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0xB
+  istruc Opcode                                   ; 0x0B
     at Opcode.mnemonic,       dd I_OR
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -222,7 +222,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg2_reg16bits, db 1
   iend
-  istruc Opcode                                   ; 0xC
+  istruc Opcode                                   ; 0x0C
     at Opcode.mnemonic,       dd I_OR
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -231,7 +231,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_IMMED
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0xD
+  istruc Opcode                                   ; 0x0D
     at Opcode.mnemonic,       dd I_OR
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -240,7 +240,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_IMMED
     at Opcode.arg2_reg16bits, db 1
   iend
-  istruc Opcode                                   ; 0xE
+  istruc Opcode                                   ; 0x0E
     at Opcode.mnemonic,       dd I_PUSH
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
@@ -249,7 +249,7 @@ opcodes:
     at Opcode.arg2_type,      dd ARGTYPE_NONE
     at Opcode.arg2_reg16bits, db 0
   iend
-  istruc Opcode                                   ; 0xF
+  istruc Opcode                                   ; 0x0F
     at Opcode.mnemonic,       dd 0
     at Opcode.group_id,       dd 0
     at Opcode.segment_id      dd 0
