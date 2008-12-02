@@ -52,12 +52,25 @@ ARGTYPE_REGSS       db    20
 ARGTYPE_REGDS       db    21
 ; No argument
 ARGTYPE_NONE        db    22
+ARGTYPE_SEGMENT     db    23
 ; Immediate and memory arguments
-ARGTYPE_IMMED       db    23
-ARGTYPE_MEMORY      db    24
+ARGTYPE_IMMED       db    24
+ARGTYPE_MEMORY      db    25
 ; Pain in the ass arguments
-ARGTYPE_REGMEM      db    25
-ARGTYPE_REGISTER    db    26
+ARGTYPE_RM_BOTH     db    26
+ARGTYPE_RM_MEMORY   db    27
+ARGTYPE_RM_REGISTER db    28
+
+; FIXME: Properly add these ones
+ARGTYPE_SHORT db 0
+ARGTYPE_NEAR  db 0
+ARGTYPE_FAR   db 0
+ARGTYPE_SIMMED db 0
+GRP_GRP1 db 0
+GRP_GRP2 db 0
+GRP_GRP3 db 0
+GRP_AROP db 0
+GRP_SHFOP db 0
 
 ;; Strings for the arguments that need it
 SARGTYPE_CONST1     db    "1", 0
@@ -103,25 +116,14 @@ ARRAY_RM_MODES      dd    SARGTYPE_RM_BX_SI, SARGTYPE_RM_BX_DI, SARGTYPE_RM_BP_S
                     dd    SARGTYPE_RM_BP_DI, SARGTYPE_RM_SI, SARGTYPE_RM_DI
                     dd    SARGTYPE_RM_BP, SARGTYPE_RM_BX
 
-;; Instruction list (for now, here)
-I_ADD             db    "add", 0
-
 struc Opcode
   .mnemonic:        resd    1
+  .mnem_group:      resd    1
   .arg1_type:       resd    1
   .arg1_reg16bits:  resb    1
   .arg2_type:       resd    1
   .arg2_reg16bits:  resb    1
 endstruc
-
-opcodes:
-  istruc Opcode
-    at Opcode.mnemonic,       dd I_ADD
-    at Opcode.arg1_type,      dd ARGTYPE_REGMEM
-    at Opcode.arg1_reg16bits, db 0
-    at Opcode.arg2_type,      dd ARGTYPE_REGISTER
-    at Opcode.arg2_reg16bits, db 0
-  iend
 
 %endif
 
