@@ -36,9 +36,10 @@
 ;; Out:         ebx = opcode position in the table
 ;; Destroys:    eax, ebx, ecx
 %macro GetOpcodePosition 1
-  mov eax, %1
+  xor ecx, ecx
+  mov cl,  %1
   mov ebx, opcodes
-  mov ecx, Opcode_size
+  mov eax, Opcode_size
   mul ecx
   add ebx, eax
 %endmacro
