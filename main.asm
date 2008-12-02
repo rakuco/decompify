@@ -55,9 +55,14 @@
   ProcessArgument arg2
 %endmacro
 
+%macro PrintInstruction 0
+%endmacro
+
 %macro ProcessArgument 1
   ; Constant arguments
   mov dl, [%1_type]
+  cmp dl, [ARGTYPE_NONE]
+  jmp %%addr_end
   cmp dl, [ARGTYPE_REGDS]  ; Last constant argument in the array
   jbe %%addr_const
   cmp dl, [ARGTYPE_RM_BOTH] ; First of its kind in the array
@@ -190,10 +195,13 @@ _start:
 
     ;; Get the corresponding opcode position in the table
     GetOpcodePosition [comfile + esi] ; ebx = opcodes[[comfile+esi]]
+    inc esi
+
     LoadOpcodeData ebx
 
-    inc esi
-    ;jmp .main_loop
+    PrintInstruction
+
+    jmp .main_loop
   .end_main_loop:
 
   ;; Close the files and exit
