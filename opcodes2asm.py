@@ -82,9 +82,9 @@ args_dict = {
 }
 
 def parse_dat(datfile):
-  opcode_re = re.compile(r'(?P<hexcode>[\da-fA-F]{2})\s+(?P<mnemonic>[\w<>]+)(?:\s+(?P<arg1>[\w/]+)(?:,(?P<arg2>[\w/]+))?)?')
-  groupstart_re = re.compile(r';\s*<(?P<groupname>[\w]+)>:')
-  groupentry_re = re.compile(r';\s*[01]{3}(?:\s+(?P<mnemonic>\w+)?\s*)')
+  opcode_re = re.compile(r"(?P<hexcode>[\da-fA-F]{2})\s+'?(?P<mnemonic>[\w<> ]+)'?(?:\s+(?P<arg1>[\w/]+)(?:,(?P<arg2>[\w/]+))?)?")
+  groupstart_re = re.compile(r";\s*<(?P<groupname>[\w]+)>:")
+  groupentry_re = re.compile(r";\s*[01]{3}(?:\s+'?(?P<mnemonic>\w+)?'?\s*)")
 
   groups = {}
   mnemonics = set()
@@ -99,7 +99,7 @@ def parse_dat(datfile):
     match = opcode_re.match(line)
     if match:
       opcode = int(match.group('hexcode'), 16)
-      mnemonic = match.group('mnemonic')
+      mnemonic = match.group('mnemonic').replace(' ', '_')
       opcodes[opcode] = {'mnemonic': mnemonic,
                          'arg1': match.group('arg1'),
                          'arg2': match.group('arg2')}
@@ -118,16 +118,20 @@ def parse_dat(datfile):
       # Read its 7 entries
       for i in range(8):
         groupmatch = groupentry_re.match(lines.pop(0))
-        groups[groupname].append(groupmatch.group('mnemonic'))
 
         if groupmatch.group('mnemonic'):
-          mnemonics.add(groupmatch.group('mnemonic'))
+          mnemonic = groupmatch.group('mnemonic').replace(' ', '_')
+          groups[groupname].append(mnemonic)
+          mnemonics.add(mnemonic)
+        else:
+          groups[groupname].append(None)
 
   return opcodes, mnemonics, groups
 
 def print_mnemonics(mnemonics):
   for m in sorted(list(mnemonics)):
-    print "I_%s%sdb    \"%s\", 0" % (m.upper(), ' '*(15-len(m)), m)
+    print "I_%s%sdb    \"%s\", 0" % (m.upper(), ' '*(15-len(m)), m.replace('_',
+                                                                           ' '))
 
 def print_opcodes(optable):
   for pos in range(256):

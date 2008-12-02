@@ -183,7 +183,7 @@
 97	xchg	AX,DI
 98	cbw
 99	cwd
-9a	call	far
+9a	'call word'	far
 9b	wait
 9c	pushf
 9d	popf
@@ -261,18 +261,18 @@ e4	in	AL,imm8
 e5	in	AX,imm8
 e6	out	imm8,AL
 e7	out	imm8,AX
-e8	call	near
-e9	jmp	near
-ea	jmp	far
-eb	jmp	short
+e8	'call word'	near
+e9	'jmp word'	near
+ea	'jmp word'	far
+eb	'jmp short'	short
 ec	in	AL,DX
 ed	in	AX,DX
 ee	out	DX,AL
 ef	out	DX,AX
 f0	lock ; decompify - no need for it to be special
 ; f1
-f2	repne ; decompify - no need for it to be special
-f3	rep  ; decompify - no need for it to be special
+f2	repne	; decompify - no need for it to be special
+f3	rep	; decompify - no need for it to be special
 f4	hlt
 f5	cmc
 f6	<Grp1>	r/m8
@@ -306,10 +306,10 @@ ff	<Grp3>	r/m16
 ; <Grp3>:    
 ;        000  inc
 ;	 001  dec
-;        010  call word ptr [...]
-;        011  call dword ptr [...]
-;        100  jmp word ptr [...]
-;        101  jmp dword ptr [...]
+;        010  'call word' word ptr [...]
+;        011  'call word' dword ptr [...]
+;        100  'jmp word' word ptr [...]
+;        101  'jmp word' dword ptr [...]
 ;        110  push
 ;        111  
 
