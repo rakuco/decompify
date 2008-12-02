@@ -70,12 +70,12 @@ args_dict = {
   'mem32':  ['memory', True],
   'memoffs8':   ['rm_memory', False],
   'memoffs16':  ['rm_memory', True],
-  'near':   ['near', True],   # XXX: not implemented yet
-  'far':    ['far', True],    # XXX: not implemented yet
-  'short':  ['short', True],  # XXX: not implemented yet
+  'near':   ['relative', True],
+  'far':    ['relative', True],
+  'short':  ['relative', False],
   'imm8':   ['immed', False],
   'imm16':  ['immed', True],
-  'simm8':  ['simmed', True], # XXX: not implemented yet
+  'simm8':  ['simmed', True],
   '1':      ['const1', True],
   '3':      ['const3', True],
   'prefix': ['none', True]
@@ -192,7 +192,7 @@ def print_opcodes(optable):
 
     print '    at Opcode.mnemonic,       dd ' + mn
     print '    at Opcode.group_id,       dd ' + grp
-    print '    at Opcode.segment_id      dd ' + seg
+    print '    at Opcode.segment_id,     dd ' + seg
     print '    at Opcode.arg1_type,      dd ' + a1type
     print '    at Opcode.arg1_reg16bits, db ' + a1reg
     print '    at Opcode.arg2_type,      dd ' + a2type
