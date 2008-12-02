@@ -53,6 +53,8 @@
   ;sys_write [logfile_fd], edi, 4
 
   StoreData 32, [ebx + Opcode.mnemonic], [mnemonic]
+  StoreData 32, [ebx + Opcode.group_id], [group_id]
+  StoreData 32, [ebx + Opcode.segment_id], [segment_id]
   StoreData 32, [ebx + Opcode.arg1_type], [arg1_type]
   StoreData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
   StoreData 32, [ebx + Opcode.arg2_type], [arg2_type]
@@ -127,6 +129,8 @@ section .bss
 
   ;; Opcode and its operands
   mnemonic                  resd    1
+  group_id                  resd    1
+  segment_id                resd    1
   arg1_type                 resd    1
   arg1_reg16bits            resb    1
   arg1_basereg              resd    1
