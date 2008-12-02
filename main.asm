@@ -45,6 +45,13 @@
 %endmacro
 
 %macro LoadOpcodeData 1
+  ;; XXX: debug code; remove for production
+  ;mov ebx, opcodes
+  ;mov edi, [ebx+198+Opcode.mnemonic]
+  ;sys_write [logfile_fd], edi, 4
+  ;mov edi, [ebx+Opcode.mnemonic]
+  ;sys_write [logfile_fd], edi, 4
+
   StoreData 32, [ebx + Opcode.mnemonic], [mnemonic]
   StoreData 32, [ebx + Opcode.arg1_type], [arg1_type]
   StoreData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
