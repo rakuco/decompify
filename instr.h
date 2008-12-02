@@ -97,8 +97,8 @@ SARGTYPE_REGSS      db    "ss", 0
 SARGTYPE_REGDS      db    "ds", 0
 SARGTYPE_RM_BX_SI   db    "bx+si", 0
 SARGTYPE_RM_BX_DI   db    "bx+di", 0
-SARGTYPE_RM_BP_SI   db    "bx+si", 0
-SARGTYPE_RM_BP_DI   db    "bx+si", 0
+SARGTYPE_RM_BP_SI   db    "bp+si", 0
+SARGTYPE_RM_BP_DI   db    "bp+si", 0
 SARGTYPE_RM_SI      db    "si", 0
 SARGTYPE_RM_DI      db    "di", 0
 SARGTYPE_RM_BP      db    "bp", 0
