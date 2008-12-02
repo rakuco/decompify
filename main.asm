@@ -174,7 +174,8 @@ _start:
   call get_file_size
   add esp, 4
   mov [comfile_size], eax
-  sys_read [comfile_fd], comfile, [comfile_size]
+  sys_lseek [comfile_fd], 0, SEEK_SET
+  sys_read  [comfile_fd], comfile, [comfile_size]
   sys_close [comfile_fd]
 
   ;; Open the output .ASM file, exit on error
