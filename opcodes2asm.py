@@ -157,7 +157,7 @@ def print_opcodes(optable):
 
     # group
     if mn.startswith('I_<'):
-      grp = 'GRP_' + mn[3:-1].upper()
+      grp = 'ARRAY_GRP_' + mn[3:-1].upper()
       mn = '0'
     else:
       grp = '0'
