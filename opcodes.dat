@@ -269,10 +269,10 @@ ec	in	AL,DX
 ed	in	AX,DX
 ee	out	DX,AL
 ef	out	DX,AX
-f0	lock		prefix
+f0	lock ; decompify - no need for it to be special
 ; f1
-f2	repne		prefix
-f3	rep		prefix	; or repe
+f2	repne ; decompify - no need for it to be special
+f3	rep  ; decompify - no need for it to be special
 f4	hlt
 f5	cmc
 f6	<Grp1>	r/m8
