@@ -128,6 +128,18 @@ def parse_dat(datfile):
 
   return opcodes, mnemonics, groups
 
+def print_groups(grptable):
+  for group in grptable:
+    print "ARRAY_GRP_%s \\" % group.upper()
+
+    for element in grptable[group]:
+      print "    dd ",
+
+      if element:
+        print 'I_' + element.upper()
+      else:
+        print '0'
+
 def print_mnemonics(mnemonics):
   for m in sorted(list(mnemonics)):
     print "I_%s%sdb    \"%s\", 0" % (m.upper(), ' '*(15-len(m)), m.replace('_',
@@ -212,6 +224,10 @@ def opcodes2asm(datfile):
   print ";; Opcodes"
   print "opcodes:"
   print_opcodes(optable)
+
+  print
+  print ";; Groups"
+  print_groups(grptable)
 
   # Footer
   print
