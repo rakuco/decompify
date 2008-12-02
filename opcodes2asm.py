@@ -84,7 +84,7 @@ args_dict = {
 def parse_dat(datfile):
   opcode_re = re.compile(r"(?P<hexcode>[\da-fA-F]{2})\s+'?(?P<mnemonic>[\w<> ]+)'?(?:\s+(?P<arg1>[\w/]+)(?:,(?P<arg2>[\w/]+))?)?")
   groupstart_re = re.compile(r";\s*<(?P<groupname>[\w]+)>:")
-  groupentry_re = re.compile(r";\s*[01]{3}(?:\s+'?(?P<mnemonic>\w+)?'?\s*)")
+  groupentry_re = re.compile(r";\s*[01]{3}(?:\s+'?(?P<mnemonic>[\w ]+)?'?\s*)")
 
   groups = {}
   mnemonics = set()
