@@ -24,6 +24,7 @@
 ;;
 
 %include "instr.h"
+%include "opcodes.h"
 %include "syscalls.h"
 
 ;; Number of command line arguments
@@ -59,7 +60,7 @@
   mov dl, [%1_type]
   cmp dl, [ARGTYPE_REGDS]  ; Last constant argument in the array
   jbe %%addr_const
-  cmp dl, [ARGTYPE_REGMEM] ; First of its kind in the array
+  cmp dl, [ARGTYPE_RM_BOTH] ; First of its kind in the array
   jae %%addr_regmem
   jmp %%addr_immed  ; FIXME: there will be other types, this comparison will grow
 
