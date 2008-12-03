@@ -85,7 +85,11 @@
 %endmacro
 
 %macro PrintInstruction 0
+  ;; Mnemonic
   exec write_string, [asmfile_fd], [mnemonic]
+  exec write_string, [asmfile_fd], space
+
+  ;; End
   exec write_string, [asmfile_fd], nl
 %endmacro
 
