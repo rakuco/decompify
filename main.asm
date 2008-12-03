@@ -34,16 +34,15 @@
 ;; Maximum size of a .COM file
 %define COMFILEMAXSIZE    0xFFFF
 
-;; In:          buffer byte
-;; Out:         ebx = opcode position in the table
-;; Destroys:    eax, ebx, ecx
-%macro GetOpcodePosition 1
+;; GetArrayPosition(void *buffer, int pos, size_t item_size)
+;; Destroys:    ebx
+%macro GetArrayPosition 3
   push eax
   push ecx
   xor  ecx, ecx
-  mov  cl,  %1
-  mov  ebx, opcodes
-  mov  eax, Opcode_size
+  mov  cl,  %2
+  mov  ebx, %1
+  mov  eax, %3
   mul  ecx
   add  ebx, eax
   pop  ecx
@@ -212,7 +211,8 @@ _start:
     jae near .end_main_loop
 
     ;; Get the corresponding opcode position in the table
-    GetOpcodePosition [comfile + esi] ; ebx = opcodes[[comfile+esi]]
+    ;; ebx = opcodes[[comfile+esi]]
+    GetArrayPosition opcodes, [comfile + esi], Opcode_size
     inc esi
 
     LoadOpcodeData ebx
