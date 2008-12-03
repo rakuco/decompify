@@ -95,6 +95,84 @@
     ProcessArgument arg2
 %endmacro
 
+%macro PrintArguments 1
+  cmp dword [%1_type], ARGTYPE_REGDS
+  jbe %%arg_constant
+  cmp dword [%1_type], ARGTYPE_MEMORY
+  je  %%arg_memory
+  cmp dword [%1_type], ARGTYPE_IMMED
+  je  %%arg_immed
+  cmp dword [%1_type], ARGTYPE_SIMMED
+  je  %%arg_simmed
+  cmp dword [%1_type], ARGTYPE_RM_BOTH
+  jae %%arg_rm
+
+  %%arg_constant:
+    mov edi, [%1_displacement]
+    exec write_string, [asmfile_fd], [edi]
+    jmp %%arg_end
+
+  %%arg_memory:
+    exec write_string, [asmfile_fd], memstart
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex,    [asmfile_fd], [%1_displacement], 16
+    exec write_string, [asmfile_fd], memend
+    jmp %%arg_end
+
+  %%arg_immed:
+    exec write_string, [asmfile_fd], hexstart
+    test byte [%1_reg16bits], 1
+    jz   %%arg_immed8
+    exec write_hex,    [asmfile_fd], [%1_displacement], 16
+    jmp  %%arg_end
+  %%arg_immed8:
+    exec write_hex,    [asmfile_fd], [%1_displacement], 8
+    jmp %%arg_end
+
+  %%arg_simmed:
+    test byte [%1_displacement], 0x80
+    jz   %%arg_simmed_neg
+    exec write_string, [asmfile_fd], plus
+    jmp  %%arg_simmed_writenum
+  %%arg_simmed_neg:
+    exec write_string, [asmfile_fd], minus
+  %%arg_simmed_writenum:
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex,    [asmfile_fd], [%1_displacement], 8
+
+  %%arg_rm:
+    cmp  dword [arg1_type], ARGTYPE_RM_REGISTER
+    jne  %%arg_rm_not_rm_register
+    exec write_string, [asmfile_fd], [arg1_basereg]
+    jmp  %%arg_end
+  %%arg_rm_not_rm_register:
+    cmp  dword [arg1_indexreg], SARGTYPE_REGDI
+    ja   %%arg_rm_normalflow
+    cmp  dword [arg1_indexreg], 0
+    je   %%arg_rm_normalflow
+    exec write_string, [asmfile_fd], [arg1_indexreg]
+    jmp  %%arg_end
+  %%arg_rm_normalflow:
+    exec write_string, [asmfile_fd], s_word
+    exec write_string, [asmfile_fd], space
+    exec write_string, [asmfile_fd], memstart
+    ;; XXX: insert segment code here
+    cmp  dword [arg1_indexreg], 0
+    je   %%arg_rm_writedisp
+    exec write_string, [asmfile_fd], [arg1_indexreg]
+    cmp  dword [arg1_displacement], 0
+    je   %%arg_rm_writeend
+    exec write_string, [asmfile_fd], plus
+  %%arg_rm_writedisp:
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex,    [asmfile_fd], [arg1_displacement], 16
+  %%arg_rm_writeend:
+    exec write_string, [asmfile_fd], memend
+    jmp %%arg_end
+
+  %%arg_end:
+%endmacro
+
 %macro PrintInstruction 0
   ;; Mnemonic
   exec write_string, [asmfile_fd], [mnemonic]
@@ -103,36 +181,13 @@
   cmp dword [arg1_type], ARGTYPE_NONE
   je %%end
   exec write_string, [asmfile_fd], space
-
-  cmp dword [arg1_type], ARGTYPE_REGDS
-  jbe %%arg_constant
-  cmp dword [arg1_type], ARGTYPE_MEMORY
-  je  %%arg_memory
-  cmp dword [arg1_type], ARGTYPE_RM_BOTH
-  jae %%arg_rm
-
-  %%arg_constant:
-    mov edi, [arg1_displacement]
-    exec write_string, [asmfile_fd], [edi]
-    jmp %%arg_end
-  %%arg_memory:
-    exec write_string, [asmfile_fd], memstart
-    exec write_string, [asmfile_fd], hexstart
-    exec write_hex,    [asmfile_fd], [arg1_displacement], 16
-    exec write_string, [asmfile_fd], memend
-    jmp %%arg_end
-  %%arg_rm:
-    jmp %%arg_end
-  %%arg_end:
+  PrintArguments arg1
 
   ;; Argument 2
   cmp dword [arg2_type], ARGTYPE_NONE
   je %%end
   exec write_string, [asmfile_fd], comma
-  cmp dword [arg2_type], ARGTYPE_REGDS
-  ja %%end
-  mov edi, [arg2_displacement]
-  exec write_string, [asmfile_fd], [edi]
+  PrintArguments arg2
 
   ;; End
   %%end:
@@ -149,7 +204,7 @@
   cmp edx, ARGTYPE_RM_BOTH ; First of its kind in the array
   jae %%addr_regmem
   cmp edx, ARGTYPE_MEMORY
-  je  %%addr_memory
+  jbe %%addr_memory
   jmp %%addr_immed  ; FIXME: there will be other types, this comparison will grow
 
   %%addr_const:
@@ -167,7 +222,7 @@
   %%addr_memory:
     xor edx, edx
     test [%1_reg16bits], byte 1
-    jz %%mem8bits
+    jz  %%mem8bits
     mov dx, [comfile+esi]
     inc esi
     inc esi
@@ -205,7 +260,12 @@
   ;; modREGrm
   GetRMreg al
   GetRegister %1
-  StoreData 32, [ebx], [%1_basereg]
+  StoreData 32, [ebx], [arg1_basereg]
+
+  ;; By default, set displacement and indexreg to zero
+  ;; If they're used, they're set to their values later
+  StoreData 32, dword 0, [arg1_displacement]
+  StoreData 32, dword 0, [arg1_indexreg]
 
   ;; MODregrm
   mov al, cl
@@ -219,34 +279,49 @@
   cmp al, 3
   je  %%mod11
   %%mod00:
-    StoreData 32, dword 0, [%1_displacement]
-    jmp %%mod_end
+    StoreData 32, dword 0, [arg1_displacement]
+    test cl, 0x6
+    jz  %%mod_end
+    jmp %%mod10
   %%mod01:
     xor eax, eax
     mov al, [comfile+esi+1]
     cbw
     cwde
-    StoreData 32, eax, [%1_displacement]
+    StoreData 32, eax, [arg1_displacement]
     inc esi
     jmp %%mod_end
   %%mod10:
     xor eax, eax
     mov ax, [comfile+esi+1]
-    StoreData 32, eax, [%1_displacement]
+    StoreData 32, eax, [arg1_displacement]
     inc esi
     inc esi
     jmp %%mod_end
   %%mod11:
+    mov al, cl
     GetRMrm al
-    GetRegister %1
-    StoreData 32, [ebx], [%1_indexreg]
+    GetRegister arg1
+    StoreData 32, [ebx], [arg1_indexreg]
+    print_string([arg1_indexreg])
+    printnl
+    print_string([arg1_basereg])
+    printnl
+    jmp %%end ;; rm is a reg field, skip its parsing
   %%mod_end:
 
   ;; modregRM
   mov al, cl
-  GetRMrm al
-  GetArrayPosition ARRAY_RM_MODES, al, 4
-  StoreData 32, [ebx], [%1_indexreg]
+  GetRMmod al
+  cmp al, 0
+  jne %%rm_notmod110
+  test cl, 0x6
+  jnz %%end ;; mod==00 && rm==110 has been treated in %%mod00
+  %%rm_notmod110:
+    mov al, cl
+    GetRMrm al
+    GetArrayPosition ARRAY_RM_MODES, al, 4
+    StoreData 32, [ebx], [arg1_indexreg]
 
   %%end:
     inc esi
