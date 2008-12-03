@@ -49,6 +49,11 @@
   pop  eax
 %endmacro
 
+%macro GetRMReg 1
+  shr %1, 3
+  and %1, 0x7
+%endmacro
+
 %macro LoadOpcodeData 1
   ;; XXX: debug code; remove for production
   ;mov ebx, opcodes
@@ -65,9 +70,18 @@
   StoreData 32, [ebx + Opcode.arg2_type], [arg2_type]
   StoreData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
 
+  ;; If it's a group, move the mnemonic to [mnemonic]
+  cmp [group_id], dword 0
+  je  %%no_group
+  mov al, [comfile+esi]
+  GetRMReg al
+  GetArrayPosition [group_id], al, 4
+  StoreData 32, [ebx], [mnemonic]
+
   ;; TODO: there are subtle differences between these two
-  ProcessArgument arg1
-  ProcessArgument arg2
+  %%no_group:
+    ProcessArgument arg1
+    ProcessArgument arg2
 %endmacro
 
 %macro PrintInstruction 0
