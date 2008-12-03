@@ -25,7 +25,9 @@
 
 %include "instr.h"
 %include "opcodes.h"
+%include "string.h"
 %include "syscalls.h"
+%include "util.h"
 
 ;; Number of command line arguments
 %define ARGC              4
@@ -145,16 +147,13 @@ section .bss
 
 section .data
   ;; Error messages
-  open_input_file_msg       db      "Erro ao abrir arquivo executavel", 0x0A, 0
-  open_input_file_msg_len   equ     $-open_input_file_msg
-  open_output_file_msg      db      "Erro ao abrir arquivo de saida", 0x0A, 0
-  open_output_file_msg_len  equ     $-open_output_file_msg
-  usage_msg                 db      "Uso: ./decompify executavel.com output.asm", 0x0A, 0
-  usage_msg_len             equ     $-usage_msg
+  open_input_file_msg       db    "Erro ao abrir arquivo executavel", 0x0A, 0
+  open_output_file_msg      db    "Erro ao abrir arquivo de saida", 0x0A, 0
+  usage_msg                 db    "Uso: ./decompify executavel.com output.asm", 0x0A, 0
 
 
 section .text
-  extern disasm_write_header, get_file_size
+  extern disasm_write_header, get_file_size, print_string, strlen
   global _start
 
 _start:
@@ -223,15 +222,15 @@ _start:
   sys_exit EX_OK
 
 .exit_open_input_file:
-  sys_write STDOUT, open_input_file_msg, open_input_file_msg_len
+  exec print_string, open_input_file_msg
   sys_exit EX_DATAERR
 
 .exit_open_output_file:
-  sys_write STDOUT, open_output_file_msg, open_output_file_msg_len
+  exec print_string, open_output_file_msg
   sys_exit EX_DATAERR
 
 .exit_usage:
-  sys_write STDOUT, usage_msg, usage_msg_len
+  exec print_string, usage_msg
   sys_exit  EX_USAGE
 
 ; vim:syntax=nasm:
