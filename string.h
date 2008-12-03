@@ -37,7 +37,9 @@
 %define   print_string(s) exec write_string, STDOUT, s
 
 ;; Newline ("\n\0")
+comma     db  ',', 0
 nl        db  0x0A, 0
+space     db  ' ', 0
 
 %endif
 
