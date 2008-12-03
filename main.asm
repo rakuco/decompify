@@ -72,8 +72,8 @@
 %endmacro
 
 %macro PrintInstruction 0
-  print_string([mnemonic])
-  printnl
+  exec write_string, [asmfile_fd], [mnemonic]
+  exec write_string, [asmfile_fd], nl
 %endmacro
 
 %macro ProcessArgument 1
