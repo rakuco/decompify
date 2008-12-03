@@ -196,16 +196,16 @@
 
 %macro ProcessArgument 1
   ; Constant arguments
-  mov edx, [%1_type]
-  cmp edx, ARGTYPE_NONE
+  cmp dword [%1_type], ARGTYPE_NONE
   je  %%addr_end
-  cmp edx, ARGTYPE_REGDS  ; Last constant argument in the array
+  cmp dword [%1_type], ARGTYPE_REGDS   ; Last constant argument in the array
   jbe %%addr_const
-  cmp edx, ARGTYPE_RM_BOTH ; First of its kind in the array
+  cmp dword [%1_type], ARGTYPE_RM_BOTH ; First of its kind in the array
   jae %%addr_regmem
-  cmp edx, ARGTYPE_MEMORY
+  cmp dword [%1_type], ARGTYPE_MEMORY  ; Last of its kind
   jbe %%addr_memory
-  jmp %%addr_immed  ; FIXME: there will be other types, this comparison will grow
+  cmp dword [%1_type], ARGTYPE_RELATIVE
+  je  %%addr_relative
 
   %%addr_const:
     ;; %1_displacement = ARRAY_CONSTARGS[4*argN_type]
@@ -222,20 +222,33 @@
   %%addr_memory:
     xor edx, edx
     test [%1_reg16bits], byte 1
-    jz  %%mem8bits
+    jz  %%addr_memory8
     mov dx, [comfile+esi]
     inc esi
     inc esi
-    jmp %%setmemory
-  %%mem8bits:
+    jmp %%addr_memoryset
+  %%addr_memory8:
     mov dl, [comfile+esi]
     inc esi
-  %%setmemory:
+  %%addr_memoryset:
     mov [%1_displacement], edx
     jmp %%addr_end
 
-  %%addr_immed:
-    jmp %%addr_end
+  %%addr_relative:
+    xor edx, edx
+    test [%1_reg16bits], byte 1
+    jz  %%addr_relative8
+    mov dx, [comfile+esi]
+    inc esi
+    inc esi
+    jmp %%addr_relativeset
+  %%addr_relative8:
+    mov dl, [comfile+esi]
+    inc esi
+  %%addr_relativeset:
+    add dx, 0x100
+    sub edx, esi
+    mov [%1_displacement], edx
 
   %%addr_end:
 %endmacro
@@ -280,8 +293,8 @@
   je  %%mod11
   %%mod00:
     StoreData 32, dword 0, [arg1_displacement]
-    test cl, 0x6
-    jz  %%mod_end
+    cmp cl, 0x6
+    jne %%mod_end
     jmp %%mod10
   %%mod01:
     xor eax, eax
@@ -315,8 +328,8 @@
   GetRMmod al
   cmp al, 0
   jne %%rm_notmod110
-  test cl, 0x6
-  jnz %%end ;; mod==00 && rm==110 has been treated in %%mod00
+  cmp cl, 0x6
+  je  %%end ;; mod==00 && rm==110 has been treated in %%mod00
   %%rm_notmod110:
     mov al, cl
     GetRMrm al
