@@ -251,7 +251,7 @@ d3	<ShfOp>	r/m16,CL
 d4	aam	imm8	; special
 d5	aad	imm8	; special
 ; d6	salc		; undocummented
-d7	xlat
+d7	xlatb
 ; d8-df: ESC x (FPU)
 e0	loopnz	short
 e1	loopz	short

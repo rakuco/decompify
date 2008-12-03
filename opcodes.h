@@ -109,7 +109,7 @@ I_TEST           db    "test", 0
 I_TEST_R         db    "test r", 0
 I_WAIT           db    "wait", 0
 I_XCHG           db    "xchg", 0
-I_XLAT           db    "xlat", 0
+I_XLATB          db    "xlatb", 0
 I_XOR            db    "xor", 0
 
 ;; Opcodes
@@ -2050,7 +2050,7 @@ opcodes:
     at Opcode.arg2_reg16bits, db 0
   iend
   istruc Opcode                                   ; 0xD7
-    at Opcode.mnemonic,       dd I_XLAT
+    at Opcode.mnemonic,       dd I_XLATB
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_NONE
