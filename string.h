@@ -48,6 +48,9 @@ nl              db  0x0A, 0
 plus            db  '+', 0
 space           db  ' ', 0
 
+s_byte          db  'byte', 0
+s_word          db  'word', 0
+
 %endif
 
 ; vim:syntax=nasm
