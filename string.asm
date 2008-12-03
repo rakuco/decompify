@@ -23,11 +23,12 @@
 ;;     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 
+%include "string.h"
 %include "syscalls.h"
 %include "util.h"
 
 section .text
-  global strlen, write_string
+  global strlen, write_hex, write_string
 
 ;; int strlen(char *s)
 ;;   Gets the length of a null-terminated string.
@@ -56,6 +57,49 @@ strlen:
   pop ecx
   pop ebp
 
+  ret
+
+;; write_hex (int fd, char *s, size_t elemsize)
+;;   Writes a hexadecimal byte/word/dword to fd.
+;;   This procedure was written by Christian Fowelin <christian@fowelin.de>
+;;   for libASM - http://www.fowelin.de/christian/comuter/libASM
+write_hex:
+  push ebp
+  mov ebp, esp
+  push eax
+  push ebx
+  push ecx
+  push edx
+  push esi
+
+  mov edx, [ebp+16]
+  mov esi, [ebp+12]
+  mov ebx, [ebp+8]
+
+  and edx, 0xFF
+  cmp edx, 32
+  jnae .j0
+  mov edx, 32
+.j0:
+  mov ecx, 32
+  sub ecx, edx
+  shl esi, cl
+.j1:
+  shld ecx, esi, 4
+  shl esi, 4
+  and ecx, 0x0F
+  add ecx, dword HexCharacters
+  sys_write STDOUT, ecx, 1
+  sys_write ebx, ecx, 1
+  sub edx, byte 4
+  jnz .j1
+
+  pop esi
+  pop edx
+  pop ecx
+  pop ebx
+  pop eax
+  pop ebp
   ret
 
 ;; write_string(int fd, char *s)
