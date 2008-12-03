@@ -68,6 +68,8 @@
 %endmacro
 
 %macro PrintInstruction 0
+  exec print_string, [mnemonic]
+  printnl
 %endmacro
 
 %macro ProcessArgument 1
