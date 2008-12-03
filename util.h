@@ -26,10 +26,21 @@
 %ifndef __UTIL_H
 %define __UTIL_H
 
-%macro exec 2
-  push dword %2
+;; exec(function, arg1, arg2, ..., argN)
+;;   Calls the procedure function.
+;;   It first passes the arguments according to the
+;;   C calling convention (argN down to arg1), and
+;;   after the call it removes them from the stack.
+;;
+%macro exec 2-*
+  %rep %0-1
+    %rotate -1
+    push dword %1
+  %endrep
+  %rotate -1
+
   call %1
-  add  esp, 4
+  add  esp, 4*(%0-1)
 %endmacro
 
 %endif
