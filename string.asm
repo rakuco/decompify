@@ -89,7 +89,6 @@ write_hex:
   shl esi, 4
   and ecx, 0x0F
   add ecx, dword HexCharacters
-  sys_write STDOUT, ecx, 1
   sys_write ebx, ecx, 1
   sub edx, byte 4
   jnz .j1
