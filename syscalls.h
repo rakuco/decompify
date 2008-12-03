@@ -127,15 +127,19 @@
 %endmacro
 
 %macro sys_write 3
+  push eax
   push ebx
   push ecx
+  push edx
   mov eax, SYS_WRITE
   mov ebx, %1
   mov ecx, %2
   mov edx, %3
   int LINUX_CALL
+  pop edx
   pop ecx
   pop ebx
+  pop eax
 %endmacro
 
 %endif
