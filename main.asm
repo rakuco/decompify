@@ -92,6 +92,10 @@
   cmp dword [arg1_type], ARGTYPE_NONE
   je %%end
   exec write_string, [asmfile_fd], space
+  cmp dword [arg1_type], ARGTYPE_REGDS
+  ja %%end
+  mov edi, [arg1_displacement]
+  exec write_string, [asmfile_fd], [edi]
 
   ;; Argument 2
   cmp dword [arg2_type], ARGTYPE_NONE
@@ -116,9 +120,9 @@
 
   %%addr_const:
     ;; %1_displacement = ARRAY_CONSTARGS[4*argN_type]
-    xor edx, edx
-    mov dl, [%1_type]
-    StoreData 32, [4*edx+ARRAY_CONSTARGS], [%1_displacement]
+     mov edx, [%1_type]
+     GetArrayPosition ARRAY_CONSTARGS, [edx], 4
+     mov [%1_displacement], ebx
 
     jmp %%addr_end
 
