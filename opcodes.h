@@ -16,6 +16,7 @@ I_AAS            db    "aas", 0
 I_ADC            db    "adc", 0
 I_ADD            db    "add", 0
 I_AND            db    "and", 0
+I_CALL           db    "call", 0
 I_CALL_WORD      db    "call word", 0
 I_CBW            db    "cbw", 0
 I_CLC            db    "clc", 0
@@ -47,8 +48,8 @@ I_JG             db    "jg", 0
 I_JGE            db    "jge", 0
 I_JL             db    "jl", 0
 I_JLE            db    "jle", 0
+I_JMP            db    "jmp", 0
 I_JMP_SHORT      db    "jmp short", 0
-I_JMP_WORD       db    "jmp word", 0
 I_JNO            db    "jno", 0
 I_JNS            db    "jns", 0
 I_JNZ            db    "jnz", 0
@@ -2203,7 +2204,7 @@ opcodes:
     at Opcode.arg2_reg16bits, db 1
   iend
   istruc Opcode                                   ; 0xE8
-    at Opcode.mnemonic,       dd I_CALL_WORD
+    at Opcode.mnemonic,       dd I_CALL
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RELATIVE
@@ -2212,7 +2213,7 @@ opcodes:
     at Opcode.arg2_reg16bits, db 0
   iend
   istruc Opcode                                   ; 0xE9
-    at Opcode.mnemonic,       dd I_JMP_WORD
+    at Opcode.mnemonic,       dd I_JMP
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RELATIVE
@@ -2221,7 +2222,7 @@ opcodes:
     at Opcode.arg2_reg16bits, db 0
   iend
   istruc Opcode                                   ; 0xEA
-    at Opcode.mnemonic,       dd I_JMP_WORD
+    at Opcode.mnemonic,       dd I_JMP
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RELATIVE
@@ -2450,10 +2451,10 @@ ARRAY_GRP_GRP1 \
 ARRAY_GRP_GRP3 \
     dd  I_INC
     dd  I_DEC
-    dd  I_CALL_WORD
-    dd  I_CALL_WORD
-    dd  I_JMP_WORD
-    dd  I_JMP_WORD
+    dd  I_CALL
+    dd  I_CALL
+    dd  I_JMP
+    dd  I_JMP
     dd  I_PUSH
     dd  0
 ARRAY_GRP_SHFOP \
