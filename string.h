@@ -28,8 +28,13 @@
 
 %include "util.h"
 
-;; Prints a new line character
-%define   printnl exec print_string, nl
+;; printnl(void)
+;;   Prints a new line character
+%define   printnl print_string(nl)
+
+;; print_string(char *s)
+;;   Writes s to stdout
+%define   print_string(s) exec write_string, STDOUT, s
 
 ;; Newline ("\n\0")
 nl        db  0x0A, 0

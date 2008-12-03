@@ -27,27 +27,7 @@
 %include "util.h"
 
 section .text
-  global print_string, strlen
-
-;; print_string (char *s)
-;;   Prints s to stdout.
-;;
-print_string:
-  push ebp
-  mov  ebp, esp
-
-  push edi
-  push eax
-
-  exec strlen, [ebp+8]
-  mov  edi, eax
-
-  sys_write STDOUT, [ebp+8], edi
-
-  pop eax
-  pop edi
-  pop ebp
-  ret
+  global strlen, write_string
 
 ;; int strlen(char *s)
 ;;   Gets the length of a null-terminated string.
@@ -77,5 +57,26 @@ strlen:
   pop ebp
 
   ret
+
+;; write_string(int fd, char *s)
+;;   Writes s to file descriptor fd.
+;;
+write_string:
+  push ebp
+  mov  ebp, esp
+
+  push edi
+  push eax
+
+  exec strlen, [ebp+12]
+  mov  edi, eax
+
+  sys_write [ebp+8], [ebp+12], edi
+
+  pop eax
+  pop edi
+  pop ebp
+  ret
+
 
 ; vim:syntax=nasm:

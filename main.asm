@@ -68,7 +68,7 @@
 %endmacro
 
 %macro PrintInstruction 0
-  exec print_string, [mnemonic]
+  print_string([mnemonic])
   printnl
 %endmacro
 
@@ -155,7 +155,7 @@ section .data
 
 
 section .text
-  extern disasm_write_header, get_file_size, print_string, strlen
+  extern disasm_write_header, get_file_size, strlen, write_string
   global _start
 
 _start:
@@ -224,15 +224,15 @@ _start:
   sys_exit EX_OK
 
 .exit_open_input_file:
-  exec print_string, open_input_file_msg
+  print_string(open_input_file_msg)
   sys_exit EX_DATAERR
 
 .exit_open_output_file:
-  exec print_string, open_output_file_msg
+  print_string(open_output_file_msg)
   sys_exit EX_DATAERR
 
 .exit_usage:
-  exec print_string, usage_msg
+  print_string(usage_msg)
   sys_exit  EX_USAGE
 
 ; vim:syntax=nasm:
