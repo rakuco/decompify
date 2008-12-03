@@ -49,8 +49,17 @@
   pop  eax
 %endmacro
 
-%macro GetRMReg 1
+%macro GetRMmod 1
+  shr %1, 6
+  and %1, 0x3
+%endmacro
+
+%macro GetRMreg 1
   shr %1, 3
+  and %1, 0x7
+%endmacro
+
+%macro GetRMrm 1
   and %1, 0x7
 %endmacro
 
@@ -74,9 +83,11 @@
   cmp [group_id], dword 0
   je  %%no_group
   mov al, [comfile+esi]
-  GetRMReg al
+  GetRMreg al
   GetArrayPosition [group_id], al, 4
   StoreData 32, [ebx], [mnemonic]
+
+  ;; TODO: segments
 
   ;; TODO: there are subtle differences between these two
   %%no_group:
@@ -190,7 +201,7 @@ section .data
 
 
 section .text
-  extern disasm_write_header, get_file_size, strlen, write_string
+  extern disasm_write_header, get_file_size, strlen, write_hex, write_string
   global _start
 
 _start:
