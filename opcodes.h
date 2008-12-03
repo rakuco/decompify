@@ -1380,7 +1380,7 @@ opcodes:
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg1_reg16bits, db 1
-    at Opcode.arg2_type,      dd ARGTYPE_SEGMENT
+    at Opcode.arg2_type,      dd ARGTYPE_RM_SEGMENT
     at Opcode.arg2_reg16bits, db 1
   iend
   istruc Opcode                                   ; 0x8D
@@ -1389,14 +1389,14 @@ opcodes:
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg1_reg16bits, db 1
-    at Opcode.arg2_type,      dd ARGTYPE_MEMORY
+    at Opcode.arg2_type,      dd ARGTYPE_RM_MEMORY
     at Opcode.arg2_reg16bits, db 0
   iend
   istruc Opcode                                   ; 0x8E
     at Opcode.mnemonic,       dd I_MOV
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_SEGMENT
+    at Opcode.arg1_type,      dd ARGTYPE_RM_SEGMENT
     at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg2_reg16bits, db 1
@@ -1560,7 +1560,7 @@ opcodes:
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_REGAL
     at Opcode.arg1_reg16bits, db 0
-    at Opcode.arg2_type,      dd ARGTYPE_RM_MEMORY
+    at Opcode.arg2_type,      dd ARGTYPE_MEMORY
     at Opcode.arg2_reg16bits, db 0
   iend
   istruc Opcode                                   ; 0xA1
@@ -1569,14 +1569,14 @@ opcodes:
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_REGAX
     at Opcode.arg1_reg16bits, db 1
-    at Opcode.arg2_type,      dd ARGTYPE_RM_MEMORY
+    at Opcode.arg2_type,      dd ARGTYPE_MEMORY
     at Opcode.arg2_reg16bits, db 1
   iend
   istruc Opcode                                   ; 0xA2
     at Opcode.mnemonic,       dd I_MOV
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_RM_MEMORY
+    at Opcode.arg1_type,      dd ARGTYPE_MEMORY
     at Opcode.arg1_reg16bits, db 0
     at Opcode.arg2_type,      dd ARGTYPE_REGAL
     at Opcode.arg2_reg16bits, db 0
@@ -1585,7 +1585,7 @@ opcodes:
     at Opcode.mnemonic,       dd I_MOV
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_RM_MEMORY
+    at Opcode.arg1_type,      dd ARGTYPE_MEMORY
     at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_REGAX
     at Opcode.arg2_reg16bits, db 1
@@ -1884,7 +1884,7 @@ opcodes:
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg1_reg16bits, db 1
-    at Opcode.arg2_type,      dd ARGTYPE_MEMORY
+    at Opcode.arg2_type,      dd ARGTYPE_RM_MEMORY
     at Opcode.arg2_reg16bits, db 1
   iend
   istruc Opcode                                   ; 0xC5
@@ -1893,14 +1893,14 @@ opcodes:
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_RM_REGISTER
     at Opcode.arg1_reg16bits, db 1
-    at Opcode.arg2_type,      dd ARGTYPE_MEMORY
+    at Opcode.arg2_type,      dd ARGTYPE_RM_MEMORY
     at Opcode.arg2_reg16bits, db 1
   iend
   istruc Opcode                                   ; 0xC6
     at Opcode.mnemonic,       dd I_MOV
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_MEMORY
+    at Opcode.arg1_type,      dd ARGTYPE_RM_MEMORY
     at Opcode.arg1_reg16bits, db 0
     at Opcode.arg2_type,      dd ARGTYPE_IMMED
     at Opcode.arg2_reg16bits, db 0
@@ -1909,7 +1909,7 @@ opcodes:
     at Opcode.mnemonic,       dd I_MOV
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_MEMORY
+    at Opcode.arg1_type,      dd ARGTYPE_RM_MEMORY
     at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_IMMED
     at Opcode.arg2_reg16bits, db 1
