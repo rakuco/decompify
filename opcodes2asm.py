@@ -68,7 +68,7 @@ args_dict = {
   'mem8':   ['rm_memory', False],
   'mem16':  ['rm_memory', True],
   'mem32':  ['rm_memory', True],
-  'memoffs8':   ['memory', False],
+  'memoffs8':   ['memory', True],
   'memoffs16':  ['memory', True],
   'near':   ['relative', True],
   'far':    ['relative', True],

@@ -1561,7 +1561,7 @@ opcodes:
     at Opcode.arg1_type,      dd ARGTYPE_REGAL
     at Opcode.arg1_reg16bits, db 0
     at Opcode.arg2_type,      dd ARGTYPE_MEMORY
-    at Opcode.arg2_reg16bits, db 0
+    at Opcode.arg2_reg16bits, db 1
   iend
   istruc Opcode                                   ; 0xA1
     at Opcode.mnemonic,       dd I_MOV
@@ -1577,7 +1577,7 @@ opcodes:
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
     at Opcode.arg1_type,      dd ARGTYPE_MEMORY
-    at Opcode.arg1_reg16bits, db 0
+    at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_REGAL
     at Opcode.arg2_reg16bits, db 0
   iend
