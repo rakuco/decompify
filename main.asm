@@ -170,12 +170,12 @@ section .bss
   arg1_reg16bits            resb    1
   arg1_basereg              resd    1
   arg1_indexreg             resd    1
-  arg1_displacement         resw    1
+  arg1_displacement         resd    1
   arg2_type                 resd    1
   arg2_reg16bits            resb    1
   arg2_basereg              resd    1
   arg2_indexreg             resd    1
-  arg2_displacement         resw    1
+  arg2_displacement         resd    1
 
 
 section .data
@@ -241,6 +241,8 @@ _start:
     ;; Get the corresponding opcode position in the table
     ;; ebx = opcodes[[comfile+esi]]
     GetArrayPosition opcodes, [comfile + esi], Opcode_size
+
+    ;; Increment position counter
     inc esi
 
     LoadOpcodeData ebx
