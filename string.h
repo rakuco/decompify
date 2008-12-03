@@ -36,10 +36,17 @@
 ;;   Writes s to stdout
 %define   print_string(s) exec write_string, STDOUT, s
 
-;; Newline ("\n\0")
-comma     db  ',', 0
-nl        db  0x0A, 0
-space     db  ' ', 0
+HexCharacters   db "0123456789abcdef"
+
+colon           db  ':', 0
+comma           db  ',', 0
+hexstart        db  '0x', 0
+memend          db  ']', 0
+memstart        db  '[', 0
+minus           db  '-', 0
+nl              db  0x0A, 0
+plus            db  '+', 0
+space           db  ' ', 0
 
 %endif
 
