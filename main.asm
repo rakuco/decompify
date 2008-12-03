@@ -87,10 +87,20 @@
 %macro PrintInstruction 0
   ;; Mnemonic
   exec write_string, [asmfile_fd], [mnemonic]
+
+  ;; Argument 1
+  cmp dword [arg1_type], ARGTYPE_NONE
+  je %%end
   exec write_string, [asmfile_fd], space
 
+  ;; Argument 2
+  cmp dword [arg2_type], ARGTYPE_NONE
+  je %%end
+  exec write_string, [asmfile_fd], comma
+
   ;; End
-  exec write_string, [asmfile_fd], nl
+  %%end:
+    exec write_string, [asmfile_fd], nl
 %endmacro
 
 %macro ProcessArgument 1
