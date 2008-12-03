@@ -103,15 +103,36 @@
   cmp dword [arg1_type], ARGTYPE_NONE
   je %%end
   exec write_string, [asmfile_fd], space
+
   cmp dword [arg1_type], ARGTYPE_REGDS
-  ja %%end
-  mov edi, [arg1_displacement]
-  exec write_string, [asmfile_fd], [edi]
+  jbe %%arg_constant
+  cmp dword [arg1_type], ARGTYPE_MEMORY
+  je  %%arg_memory
+  cmp dword [arg1_type], ARGTYPE_RM_BOTH
+  jae %%arg_rm
+
+  %%arg_constant:
+    mov edi, [arg1_displacement]
+    exec write_string, [asmfile_fd], [edi]
+    jmp %%arg_end
+  %%arg_memory:
+    exec write_string, [asmfile_fd], memstart
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex,    [asmfile_fd], [arg1_displacement], 16
+    exec write_string, [asmfile_fd], memend
+    jmp %%arg_end
+  %%arg_rm:
+    jmp %%arg_end
+  %%arg_end:
 
   ;; Argument 2
   cmp dword [arg2_type], ARGTYPE_NONE
   je %%end
   exec write_string, [asmfile_fd], comma
+  cmp dword [arg2_type], ARGTYPE_REGDS
+  ja %%end
+  mov edi, [arg2_displacement]
+  exec write_string, [asmfile_fd], [edi]
 
   ;; End
   %%end:
@@ -127,23 +148,109 @@
   jbe %%addr_const
   cmp edx, ARGTYPE_RM_BOTH ; First of its kind in the array
   jae %%addr_regmem
+  cmp edx, ARGTYPE_MEMORY
+  je  %%addr_memory
   jmp %%addr_immed  ; FIXME: there will be other types, this comparison will grow
 
   %%addr_const:
     ;; %1_displacement = ARRAY_CONSTARGS[4*argN_type]
-     mov edx, [%1_type]
-     GetArrayPosition ARRAY_CONSTARGS, [edx], 4
-     mov [%1_displacement], ebx
+    mov edx, [%1_type]
+    GetArrayPosition ARRAY_CONSTARGS, [edx], 4
+    mov [%1_displacement], ebx
 
     jmp %%addr_end
 
   %%addr_regmem:
+    ProcessRM %1
+    jmp %%addr_end
+
+  %%addr_memory:
+    xor edx, edx
+    test [%1_reg16bits], byte 1
+    jz %%mem8bits
+    mov dx, [comfile+esi]
+    inc esi
+    inc esi
+    jmp %%setmemory
+  %%mem8bits:
+    mov dl, [comfile+esi]
+    inc esi
+  %%setmemory:
+    mov [%1_displacement], edx
     jmp %%addr_end
 
   %%addr_immed:
     jmp %%addr_end
 
   %%addr_end:
+%endmacro
+
+%macro GetRegister 1
+  test [%1_reg16bits], byte 1
+  jz  %%8bitreg
+    mov edx, ARRAY_16BITREGS
+    jmp %%reg
+  %%8bitreg:
+    mov edx, ARRAY_8BITREGS
+  %%reg:
+    GetArrayPosition edx, al, 4
+%endmacro
+
+;; TODO: inc esi (em arg2 menos)
+%macro ProcessRM 1
+%ifidn %1, arg1
+  mov cl, [comfile+esi]
+  mov al, cl
+
+  ;; modREGrm
+  GetRMreg al
+  GetRegister %1
+  StoreData 32, [ebx], [%1_basereg]
+
+  ;; MODregrm
+  mov al, cl
+  GetRMmod al
+  cmp al, 0
+  je  %%mod00
+  cmp al, 1
+  je  %%mod01
+  cmp al, 2
+  je  %%mod10
+  cmp al, 3
+  je  %%mod11
+  %%mod00:
+    StoreData 32, dword 0, [%1_displacement]
+    jmp %%mod_end
+  %%mod01:
+    xor eax, eax
+    mov al, [comfile+esi+1]
+    cbw
+    cwde
+    StoreData 32, eax, [%1_displacement]
+    inc esi
+    jmp %%mod_end
+  %%mod10:
+    xor eax, eax
+    mov ax, [comfile+esi+1]
+    StoreData 32, eax, [%1_displacement]
+    inc esi
+    inc esi
+    jmp %%mod_end
+  %%mod11:
+    GetRMrm al
+    GetRegister %1
+    StoreData 32, [ebx], [%1_indexreg]
+  %%mod_end:
+
+  ;; modregRM
+  mov al, cl
+  GetRMrm al
+  GetArrayPosition ARRAY_RM_MODES, al, 4
+  StoreData 32, [ebx], [%1_indexreg]
+
+  %%end:
+    inc esi
+%endif
 %endmacro
 
 ;; In:        register size, src, dest
