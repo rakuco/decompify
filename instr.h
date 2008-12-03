@@ -52,16 +52,16 @@ ARGTYPE_REGSS       db    20
 ARGTYPE_REGDS       db    21
 ; No argument
 ARGTYPE_NONE        db    22
-ARGTYPE_SEGMENT     db    23
 ; Immediate and memory arguments
-ARGTYPE_IMMED       db    24
-ARGTYPE_SIMMED      db    25
+ARGTYPE_IMMED       db    23
+ARGTYPE_SIMMED      db    24
+ARGTYPE_MEMORY      db    25
 ARGTYPE_RELATIVE    db    26
-ARGTYPE_MEMORY      db    27
 ; Pain in the ass arguments
-ARGTYPE_RM_BOTH     db    28
-ARGTYPE_RM_MEMORY   db    29
-ARGTYPE_RM_REGISTER db    30
+ARGTYPE_RM_BOTH     db    27
+ARGTYPE_RM_MEMORY   db    28
+ARGTYPE_RM_REGISTER db    29
+ARGTYPE_RM_SEGMENT  db    30
 
 ;; Strings for the arguments that need it
 SARGTYPE_CONST1     db    "1", 0
