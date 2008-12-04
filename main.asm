@@ -30,7 +30,7 @@
 %include "util.h"
 
 ;; Number of command line arguments
-%define ARGC              4
+%define ARGC              3
 ;; Maximum size of a .COM file
 %define COMFILEMAXSIZE    0xFFFF
 
@@ -49,6 +49,21 @@
   pop  eax
 %endmacro
 
+;; In: al
+;; Returns a register from ARRAY_8 or 16BITREGS
+%macro GetRegister 1
+  test [%1_reg16bits], byte 1
+  jz  %%8bitreg
+    mov edx, ARRAY_16BITREGS
+    jmp %%reg
+  %%8bitreg:
+    mov edx, ARRAY_8BITREGS
+  %%reg:
+    GetArrayPosition edx, al, 4
+%endmacro
+
+;; r/m-related macros
+;; ------------------
 %macro GetRMmod 1
   shr %1, 6
   and %1, 0x3
@@ -63,63 +78,36 @@
   and %1, 0x7
 %endmacro
 
-%macro LoadOpcodeData 1
-  ;; XXX: debug code; remove for production
-  ;mov ebx, opcodes
-  ;mov edi, [ebx+198+Opcode.mnemonic]
-  ;sys_write [logfile_fd], edi, 4
-  ;mov edi, [ebx+Opcode.mnemonic]
-  ;sys_write [logfile_fd], edi, 4
-
-  StoreData 32, [ebx + Opcode.mnemonic], [mnemonic]
-  StoreData 32, [ebx + Opcode.group_id], [group_id]
-  StoreData 32, [ebx + Opcode.segment_id], [segment_id]
-  StoreData 32, [ebx + Opcode.arg1_type], [arg1_type]
-  StoreData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
-  StoreData 32, [ebx + Opcode.arg2_type], [arg2_type]
-  StoreData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
-
-  ;; If it's a group, move the mnemonic to [mnemonic]
-  cmp [group_id], dword 0
-  je  %%no_group
-  mov al, [comfile+esi]
-  GetRMreg al
-  GetArrayPosition [group_id], al, 4
-  StoreData 32, [ebx], [mnemonic]
-
-  ;; TODO: segments
-
-  ;; TODO: there are subtle differences between these two
-  %%no_group:
-    ProcessArgument arg1
-    ProcessArgument arg2
-%endmacro
-
+;; PrintArguments (argN)
+;;   Main function to display an instruction.
 %macro PrintArguments 1
   cmp dword [%1_type], ARGTYPE_REGDS
-  jbe %%arg_constant
+  jbe near %%arg_constant
   cmp dword [%1_type], ARGTYPE_MEMORY
-  je  %%arg_memory
+  je  near %%arg_memory
   cmp dword [%1_type], ARGTYPE_IMMED
-  je  %%arg_immed
+  je  near %%arg_immed
   cmp dword [%1_type], ARGTYPE_RELATIVE
-  je  %%arg_immed
+  je  near %%arg_relative
+  cmp dword [%1_type], ARGTYPE_FAR
+  je  near %%arg_far
   cmp dword [%1_type], ARGTYPE_SIMMED
-  je  %%arg_simmed
+  je  near %%arg_simmed
   cmp dword [%1_type], ARGTYPE_RM_BOTH
-  jae %%arg_rm
+  jae near %%arg_rm
 
   %%arg_constant:
     mov edi, [%1_displacement]
     exec write_string, [asmfile_fd], [edi]
-    jmp %%arg_end
+    jmp near %%arg_end
 
   %%arg_memory:
     exec write_string, [asmfile_fd], memstart
+    call write_segment
     exec write_string, [asmfile_fd], hexstart
     exec write_hex,    [asmfile_fd], [%1_displacement], 16
     exec write_string, [asmfile_fd], memend
-    jmp %%arg_end
+    jmp near %%arg_end
 
   %%arg_immed:
     exec write_string, [asmfile_fd], hexstart
@@ -129,11 +117,34 @@
     jmp  %%arg_end
   %%arg_immed8:
     exec write_hex,    [asmfile_fd], [%1_displacement], 8
-    jmp %%arg_end
+    jmp near %%arg_end
+
+  %%arg_relative:
+    exec write_string, [asmfile_fd], s_dollar
+    exec write_string, [asmfile_fd], s_dollar
+    exec write_string, [asmfile_fd], plus
+    exec write_string, [asmfile_fd], hexstart
+    test byte [%1_reg16bits], 1
+    jz   %%arg_relative8
+    exec write_hex,    [asmfile_fd], [%1_displacement], 16
+    jmp  %%arg_end
+  %%arg_relative8:
+    exec write_hex,    [asmfile_fd], [%1_displacement], 8
+    jmp near %%arg_end
+
+  %%arg_far:
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex,    [asmfile_fd], [arg2_displacement], 16
+    exec write_string, [asmfile_fd], colon
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex,    [asmfile_fd], [arg1_displacement], 16
+    jmp  near %%arg_end
 
   %%arg_simmed:
+    exec write_string, [asmfile_fd], s_byte
+    exec write_string, [asmfile_fd], space
     test byte [%1_displacement], 0x80
-    jz   %%arg_simmed_neg
+    jnz  %%arg_simmed_neg
     exec write_string, [asmfile_fd], plus
     jmp  %%arg_simmed_writenum
   %%arg_simmed_neg:
@@ -141,24 +152,69 @@
   %%arg_simmed_writenum:
     exec write_string, [asmfile_fd], hexstart
     exec write_hex,    [asmfile_fd], [%1_displacement], 8
+    jmp  near %%arg_end
 
+  ;; FIXME: this is a behemoth
   %%arg_rm:
-    cmp  dword [arg1_type], ARGTYPE_RM_REGISTER
-    jne  %%arg_rm_not_rm_register
+    ;; XXX: hack for GRP3 and its annoying operators
+    ;;      if we have 'jmp/call far/near', we need to write
+    ;;      these words before the operands
+    cmp  dword [group_id], ARRAY_GRP_GRP3
+    jne  near %%not_grp3
+    cmp  dword [arg1_basereg], SARGTYPE_REGDX
+    je   %%grp3_write_near
+    cmp  dword [arg1_basereg], SARGTYPE_REGSP
+    je   %%grp3_write_near
+    cmp  dword [arg1_basereg], SARGTYPE_REGBX
+    je   %%grp3_write_far
+    cmp  dword [arg1_basereg], SARGTYPE_REGBP
+    je   %%grp3_write_far
+    jmp  %%not_grp3
+  %%grp3_write_near:
+    exec write_string, [asmfile_fd], s_near
+    exec write_string, [asmfile_fd], space
+    jmp %%not_grp3
+  %%grp3_write_far:
+    exec write_string, [asmfile_fd], s_far
+    exec write_string, [asmfile_fd], space
+
+  ;; Checks if we only have a basereg
+  %%not_grp3:
+    cmp  dword [%1_type], ARGTYPE_RM_REGISTER
+    je   %%write_register_basereg
+    cmp  dword [%1_type], ARGTYPE_RM_SEGMENT
+    je   %%write_segment_basereg
+    jmp  %%arg_rm_not_rm_register
+  %%write_register_basereg:
     exec write_string, [asmfile_fd], [arg1_basereg]
-    jmp  %%arg_end
+    jmp  near %%arg_end
+  %%write_segment_basereg:
+    exec write_string, [asmfile_fd], [%1_basereg]
+    jmp  near %%arg_end
+
   %%arg_rm_not_rm_register:
     cmp  dword [arg1_indexreg], SARGTYPE_REGDI
     ja   %%arg_rm_normalflow
     cmp  dword [arg1_indexreg], 0
     je   %%arg_rm_normalflow
+    cmp  dword [arg1_displacement], 0
+    jne  %%arg_rm_normalflow
     exec write_string, [asmfile_fd], [arg1_indexreg]
     jmp  %%arg_end
   %%arg_rm_normalflow:
-    exec write_string, [asmfile_fd], s_word
-    exec write_string, [asmfile_fd], space
+    ;; Only write 'word' or 'byte' in the first operand
+    %ifidn %1,arg1
+      cmp  byte [arg1_reg16bits], 1
+      jne  %%write_byte
+      exec write_string, [asmfile_fd], s_word
+      jmp  %%write_normalflow
+      %%write_byte:
+      exec write_string, [asmfile_fd], s_byte
+      %%write_normalflow:
+      exec write_string, [asmfile_fd], space
+    %endif
     exec write_string, [asmfile_fd], memstart
-    ;; XXX: insert segment code here
+    call write_segment
     cmp  dword [arg1_indexreg], 0
     je   %%arg_rm_writedisp
     exec write_string, [asmfile_fd], [arg1_indexreg]
@@ -175,39 +231,20 @@
   %%arg_end:
 %endmacro
 
-%macro PrintInstruction 0
-  ;; Mnemonic
-  exec write_string, [asmfile_fd], [mnemonic]
-
-  ;; Argument 1
-  cmp dword [arg1_type], ARGTYPE_NONE
-  je %%end
-  exec write_string, [asmfile_fd], space
-  PrintArguments arg1
-
-  ;; Argument 2
-  cmp dword [arg2_type], ARGTYPE_NONE
-  je %%end
-  exec write_string, [asmfile_fd], comma
-  PrintArguments arg2
-
-  ;; End
-  %%end:
-    exec write_string, [asmfile_fd], nl
-%endmacro
-
 %macro ProcessArgument 1
   ; Constant arguments
   cmp dword [%1_type], ARGTYPE_NONE
-  je  %%addr_end
+  je  near %%addr_end
   cmp dword [%1_type], ARGTYPE_REGDS   ; Last constant argument in the array
-  jbe %%addr_const
+  jbe near %%addr_const
   cmp dword [%1_type], ARGTYPE_RM_BOTH ; First of its kind in the array
-  jae %%addr_regmem
+  jae near %%addr_regmem
   cmp dword [%1_type], ARGTYPE_MEMORY  ; Last of its kind
-  jbe %%addr_memory
+  jbe near %%addr_memory
   cmp dword [%1_type], ARGTYPE_RELATIVE
-  je  %%addr_relative
+  je  near %%addr_relative
+  cmp dword [%1_type], ARGTYPE_FAR ; FAR can only be used as arg1_type, not arg2!
+  je  near %%addr_far
 
   %%addr_const:
     ;; %1_displacement = ARRAY_CONSTARGS[4*argN_type]
@@ -250,34 +287,40 @@
     mov byte [%1_reg16bits], 1 ;; After the operations, it needs to be a word
     inc esi
   %%addr_relativeset:
-    add ax, 0x100
     add eax, esi
     mov [%1_displacement], eax
+    jmp %%addr_end
+
+  %%addr_far:
+    xor eax, eax
+    mov ax, [comfile+esi]
+    mov [arg1_displacement], eax
+    inc esi
+    inc esi
+    xor eax, eax
+    mov ax, [comfile+esi]
+    mov [arg2_displacement], eax
+    inc esi
+    inc esi
 
   %%addr_end:
 %endmacro
 
-%macro GetRegister 1
-  test [%1_reg16bits], byte 1
-  jz  %%8bitreg
-    mov edx, ARRAY_16BITREGS
-    jmp %%reg
-  %%8bitreg:
-    mov edx, ARRAY_8BITREGS
-  %%reg:
-    GetArrayPosition edx, al, 4
-%endmacro
-
-;; TODO: inc esi (em arg2 menos)
 %macro ProcessRM 1
+;; This should execute only once per instruction;
+;; the arguments for arg2 are set in the first run
 %ifidn %1, arg1
   mov cl, [comfile+esi]
   mov al, cl
 
   ;; modREGrm
   GetRMreg al
-  GetRegister %1
+  GetRegister arg1
   StoreData 32, [ebx], [arg1_basereg]
+
+  ;; If it's a segment register, overwrite [argN_basereg] with the new pointer
+  RewriteBaseIfSegment arg1
+  RewriteBaseIfSegment arg2
 
   ;; By default, set displacement and indexreg to zero
   ;; If they're used, they're set to their values later
@@ -297,7 +340,9 @@
   je  %%mod11
   %%mod00:
     StoreData 32, dword 0, [arg1_displacement]
-    cmp cl, 0x6
+    mov al, cl
+    and al, 7
+    cmp al, 6
     jne %%mod_end
     jmp %%mod10
   %%mod01:
@@ -328,7 +373,9 @@
   GetRMmod al
   cmp al, 0
   jne %%rm_notmod110
-  cmp cl, 0x6
+  mov al, cl
+  and al, 7
+  cmp al, 6
   je  %%end ;; mod==00 && rm==110 has been treated in %%mod00
   %%rm_notmod110:
     mov al, cl
@@ -341,8 +388,18 @@
 %endif
 %endmacro
 
+%macro RewriteBaseIfSegment 1
+  cmp dword [%1_type], ARGTYPE_RM_SEGMENT
+  jne %%end
+  GetArrayPosition ARRAY_SEGMENTS, al, 4
+  StoreData 32, [ebx], [%1_basereg]
+
+  %%end:
+%endmacro
+
 ;; In:        register size, src, dest
 ;; Destroys:  edx
+;; Handy macro when you have something like mov [dest], [src]
 %macro StoreData 3
   %push TempContext
 
@@ -368,23 +425,22 @@ section .bss
   comfile                   resb    COMFILEMAXSIZE
   comfile_fd                resw    2
   comfile_name              resb    255
-  comfile_size              resw    1
-  logfile_name resb 255
-  logfile_fd resw 2
+  comfile_size              resw    2
 
   ;; Opcode and its operands
+  opcode                    resb    1
   mnemonic                  resd    1
   group_id                  resd    1
   segment_id                resd    1
   arg1_type                 resd    1
-  arg1_reg16bits            resb    1
   arg1_basereg              resd    1
   arg1_indexreg             resd    1
+  arg1_reg16bits            resb    1
   arg1_displacement         resd    1
   arg2_type                 resd    1
-  arg2_reg16bits            resb    1
   arg2_basereg              resd    1
   arg2_indexreg             resd    1
+  arg2_reg16bits            resb    1
   arg2_displacement         resd    1
 
 
@@ -399,6 +455,117 @@ section .text
   extern disasm_write_header, get_file_size, strlen, write_hex, write_string
   global _start
 
+load_opcode_data:
+  ;; If it's a segment, load the next byte and preserve the segment reference
+  cmp dword [ebx + Opcode.segment_id], 0
+  je  .not_segment
+  StoreData 32, [ebx + Opcode.segment_id], [segment_id]
+  GetArrayPosition opcodes, [comfile + esi], Opcode_size
+  mov cl, [comfile+esi]
+  mov [opcode], cl
+  inc esi
+  jmp .load_data
+
+  .not_segment:
+    StoreData 32, [ebx + Opcode.segment_id], [segment_id]
+  .load_data:
+    StoreData 32, [ebx + Opcode.mnemonic], [mnemonic]
+    StoreData 32, [ebx + Opcode.group_id], [group_id]
+    StoreData 32, [ebx + Opcode.arg1_type], [arg1_type]
+    StoreData 8,  [ebx + Opcode.arg1_reg16bits], [arg1_reg16bits]
+    StoreData 32, [ebx + Opcode.arg2_type], [arg2_type]
+    StoreData 8,  [ebx + Opcode.arg2_reg16bits], [arg2_reg16bits]
+
+    ;; If it's a group, move the mnemonic to [mnemonic]
+    cmp [group_id], dword 0
+    je  .process_arguments
+    mov al, [comfile+esi]
+    GetRMreg al
+    GetArrayPosition [group_id], al, 4 ;; ebx = group_id[4*al]
+    StoreData 32, [ebx], [mnemonic]
+    cmp dword [mnemonic], 0
+    jne .process_arguments
+    StoreData 32, ARGTYPE_NONE, [arg1_type] ;; If the mnemonic was not found,
+    StoreData 32, ARGTYPE_NONE, [arg2_type] ;; make the arguments None.
+
+  .process_arguments:
+    ProcessArgument arg1
+    ProcessArgument arg2
+
+    ret
+
+print_instruction:
+  cmp dword [arg1_type], ARGTYPE_RM_BOTH
+  jae .check_mnemonic
+  cmp dword [arg1_type], ARGTYPE_MEMORY
+  je  .check_mnemonic
+  cmp dword [segment_id], 0
+  je  .check_mnemonic
+  call write_segment_db  ;; Write db 0xSEGCODE in case we need to
+
+  .check_mnemonic:
+    cmp  dword [mnemonic], 0
+    jne  .known_byte
+    exec write_string, [asmfile_fd], s_db
+    exec write_string, [asmfile_fd], space
+    exec write_string, [asmfile_fd], hexstart
+    exec write_hex, [asmfile_fd], [opcode], 8
+    jmp  near .end
+  .known_byte:
+    ;; Mnemonic
+    exec write_string, [asmfile_fd], [mnemonic]
+    ;; Argument 1
+    cmp dword [arg1_type], ARGTYPE_NONE
+    je near .end
+    exec write_string, [asmfile_fd], space
+    PrintArguments arg1
+    ;; Argument 2
+    cmp dword [arg2_type], ARGTYPE_NONE
+    je near .end
+    exec write_string, [asmfile_fd], comma
+    PrintArguments arg2
+  .end:
+    exec write_string, [asmfile_fd], nl
+    ret
+
+;; Writes the 'segment:', like ds:
+write_segment:
+  cmp dword [segment_id], 0
+  je  .end
+  exec write_string, [asmfile_fd], [segment_id]
+  exec write_string, [asmfile_fd], colon
+.end:
+  ret
+
+;; Writes 'db 0xREGCODE', like db 0x26.
+write_segment_db:
+  exec write_string, [asmfile_fd], s_db
+  exec write_string, [asmfile_fd], space
+  exec write_string, [asmfile_fd], hexstart
+  cmp  dword [segment_id], SARGTYPE_REGES
+  je   .write_db_es
+  cmp  dword [segment_id], SARGTYPE_REGCS
+  je   .write_db_cs
+  cmp  dword [segment_id], SARGTYPE_REGSS
+  je   .write_db_ss
+  cmp  dword [segment_id], SARGTYPE_REGDS
+  je   .write_db_ds
+  jmp  .end
+.write_db_es:
+  exec write_hex, [asmfile_fd], 0x26, 8
+  jmp .end
+.write_db_cs:
+  exec write_hex, [asmfile_fd], 0x2E, 8
+  jmp .end
+.write_db_ss:
+  exec write_hex, [asmfile_fd], 0x36, 8
+  jmp .end
+.write_db_ds:
+  exec write_hex, [asmfile_fd], 0x3E, 8
+.end:
+  exec write_string, [asmfile_fd], nl
+  ret
+
 _start:
   ;; Check arguments and exit if the command line is incorrect
   pop eax
@@ -409,12 +576,6 @@ _start:
   pop eax
   pop dword [comfile_name]
   pop dword [asmfile_name]
-  pop dword [logfile_name]
-
-  sys_open [logfile_name], O_WRONLY|O_TRUNC|O_CREAT
-  cmp eax, -1
-  jle near .exit_open_input_file
-  mov [logfile_fd], eax
 
   ;; Open the .COM file, exit on error
   sys_open [comfile_name]
@@ -451,20 +612,26 @@ _start:
     ;; Get the corresponding opcode position in the table
     ;; ebx = opcodes[[comfile+esi]]
     GetArrayPosition opcodes, [comfile + esi], Opcode_size
+    mov cl, [comfile+esi]
+    mov [opcode], cl
 
     ;; Increment position counter
     inc esi
 
-    LoadOpcodeData ebx
-
-    PrintInstruction
+    call load_opcode_data
+    call print_instruction
 
     jmp .main_loop
   .end_main_loop:
 
+  ;; There may be a segment byte dangling around...
+  cmp dword [segment_id], 0
+  je  .no_seg_left
+  call write_segment_db
+
+.no_seg_left:
   ;; Close the files and exit
   sys_close [asmfile_fd]
-  sys_close [logfile_fd]
   sys_exit EX_OK
 
 .exit_open_input_file:
