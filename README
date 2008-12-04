@@ -12,6 +12,18 @@ Introduction
 
   It's written for NASM and should compile under any Linux 2.6.x kernel.
 
+Acknowledgements
+----------------
+  The design of the program was heavily influencied by Marius Gedminas' Disasm,
+  which was also a school project and had the same purpose, but it generated
+  a disassembly suitable for TASM.
+  For more information, please check Marius' site: http://gedmin.as/disasm
+
+  Christian Fowelin's libASM was of great help as well. Even though I only
+  used one of his functions (WriteHex) directly, the simple looking at his
+  code is of great value.
+  libASM: http://www.fowelin.de/christian/computer/libASM
+
 Instruction set
 ---------------
   decompify follows the university assignment and only implements the Intel 186
