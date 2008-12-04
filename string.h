@@ -49,6 +49,10 @@ plus            db  '+', 0
 space           db  ' ', 0
 
 s_byte          db  'byte', 0
+s_db            db  'db', 0
+s_dollar        db  '$', 0
+s_far           db  'far', 0
+s_near          db  'near', 0
 s_word          db  'word', 0
 
 %endif
