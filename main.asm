@@ -102,6 +102,8 @@
   je  %%arg_memory
   cmp dword [%1_type], ARGTYPE_IMMED
   je  %%arg_immed
+  cmp dword [%1_type], ARGTYPE_RELATIVE
+  je  %%arg_immed
   cmp dword [%1_type], ARGTYPE_SIMMED
   je  %%arg_simmed
   cmp dword [%1_type], ARGTYPE_RM_BOTH
@@ -238,17 +240,19 @@
     xor edx, edx
     test [%1_reg16bits], byte 1
     jz  %%addr_relative8
-    mov dx, [comfile+esi]
+    mov ax, [comfile+esi]
     inc esi
     inc esi
     jmp %%addr_relativeset
   %%addr_relative8:
-    mov dl, [comfile+esi]
+    mov al, [comfile+esi]
+    cbw
+    mov byte [%1_reg16bits], 1 ;; After the operations, it needs to be a word
     inc esi
   %%addr_relativeset:
-    add dx, 0x100
-    sub edx, esi
-    mov [%1_displacement], edx
+    add ax, 0x100
+    add eax, esi
+    mov [%1_displacement], eax
 
   %%addr_end:
 %endmacro
@@ -316,10 +320,6 @@
     GetRMrm al
     GetRegister arg1
     StoreData 32, [ebx], [arg1_indexreg]
-    print_string([arg1_indexreg])
-    printnl
-    print_string([arg1_basereg])
-    printnl
     jmp %%end ;; rm is a reg field, skip its parsing
   %%mod_end:
 
