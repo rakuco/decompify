@@ -1301,7 +1301,7 @@ opcodes:
     at Opcode.arg1_type,      dd ARGTYPE_RM_BOTH
     at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_SIMMED
-    at Opcode.arg2_reg16bits, db 1
+    at Opcode.arg2_reg16bits, db 0
   iend
   istruc Opcode                                   ; 0x84
     at Opcode.mnemonic,       dd I_TEST
@@ -1505,7 +1505,7 @@ opcodes:
     at Opcode.mnemonic,       dd I_CALL_WORD
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_RELATIVE
+    at Opcode.arg1_type,      dd ARGTYPE_FAR
     at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_NONE
     at Opcode.arg2_reg16bits, db 0
@@ -2225,7 +2225,7 @@ opcodes:
     at Opcode.mnemonic,       dd I_JMP
     at Opcode.group_id,       dd 0
     at Opcode.segment_id,     dd 0
-    at Opcode.arg1_type,      dd ARGTYPE_RELATIVE
+    at Opcode.arg1_type,      dd ARGTYPE_FAR
     at Opcode.arg1_reg16bits, db 1
     at Opcode.arg2_type,      dd ARGTYPE_NONE
     at Opcode.arg2_reg16bits, db 0

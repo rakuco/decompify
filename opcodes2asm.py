@@ -71,11 +71,11 @@ args_dict = {
   'memoffs8':   ['memory', True],
   'memoffs16':  ['memory', True],
   'near':   ['relative', True],
-  'far':    ['relative', True],
+  'far':    ['far', True],
   'short':  ['relative', False],
   'imm8':   ['immed', False],
   'imm16':  ['immed', True],
-  'simm8':  ['simmed', True],
+  'simm8':  ['simmed', False],
   '1':      ['const1', True],
   '3':      ['const3', True],
   'prefix': ['none', True]
