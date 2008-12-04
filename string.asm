@@ -62,7 +62,7 @@ strlen:
 ;; write_hex (int fd, char *s, size_t elemsize)
 ;;   Writes a hexadecimal byte/word/dword to fd.
 ;;   This procedure was written by Christian Fowelin <christian@fowelin.de>
-;;   for libASM - http://www.fowelin.de/christian/comuter/libASM
+;;   for libASM - http://www.fowelin.de/christian/computer/libASM
 write_hex:
   push ebp
   mov ebp, esp
