@@ -32,10 +32,9 @@ section .data
               db ";   Projeto 2 - Grupo 30", 0x0A,
               db "; COM file disassembled by decompify v0.0.1", 0x0A,
               db "; see http://github.com/rakuco/decompify", 0x0A, 0X0A,
-
-              db "org 0x100", 0x0A, 0x0A
-
-              db "start:", 0x0A, 0
+              db "org 0x100", 0x0A,
+              db "section .text", 0x0A, 0x0A
+              db "start:", 0x0A
   header_len  equ $-header_msg
 
 section .text
